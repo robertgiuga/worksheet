@@ -1,0 +1,24 @@
+img{
+  height: 20%;
+  width: 30%;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 10%;
+}
+.mysidenav{
+  width: 150px;
+}
+@media (min-width: 800px) {
+  .mysidenav{
+    width: 20%;
+  }
+}
+
+.my-list{
+  width: 150px;
+}
+@media (min-width: 800px) {
+  .my-list{
+    width: 20%;
+  }
+}

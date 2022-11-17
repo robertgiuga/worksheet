@@ -1,0 +1,41 @@
+<mat-sidenav-container >
+  <mat-sidenav #sidenav [mode]="sidenavMode" opened class=".mysidenav">
+    <mat-nav-list>
+      <img alt="company logo" fxLayoutAlign="center center"
+           src="https://seeklogo.com/images/B/business-company-logo-C561B48365-seeklogo.com.png">
+      <mat-list-item class="my-list">
+        <button mat-button color="primary">
+          <mat-icon>home</mat-icon>
+        </button>
+        <span>Home</span>
+      </mat-list-item>
+      <mat-list-item>
+        <button mat-button color="primary">
+          <mat-icon>dashboard</mat-icon>
+        </button>
+         <span>Dashboard</span>
+      </mat-list-item>
+      <mat-list-item>
+        <button mat-button color="primary">
+          <mat-icon>perm_identity</mat-icon>
+        </button>
+        <span>Manage Employees</span>
+      </mat-list-item>
+      <mat-list-item>
+        <button mat-button color="primary">
+          <mat-icon>library_books</mat-icon>
+        </button>
+        <span>Reports</span>
+      </mat-list-item>
+    </mat-nav-list>
+  </mat-sidenav>
+  <mat-sidenav-content>
+    <mat-toolbar color="primary" style="margin-bottom: 15px">
+      <button mat-icon-button (click)="sidenav.toggle()">
+        <mat-icon>menu</mat-icon>
+      </button>
+      <span>Worksheet</span>
+    </mat-toolbar>
+    <router-outlet></router-outlet>
+  </mat-sidenav-content>
+</mat-sidenav-container>

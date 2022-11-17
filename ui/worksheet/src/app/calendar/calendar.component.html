@@ -1,5 +1,122 @@
-<div>
-  <mwl-calendar-month-view
-    [viewDate]="viewDate"
-  ></mwl-calendar-month-view>
+<div class="row text-center" style="padding: 10px">
+  <div class="col-md-4">
+    <div class="btn-group">
+      <div
+        class="btn btn-primary"
+        mwlCalendarPreviousView
+        [view]="view"
+        [(viewDate)]="viewDate"
+        (viewDateChange)="closeOpenMonthViewDay()"
+      >
+        Previous
+      </div>
+      <div
+        class="btn btn-outline-secondary"
+        mwlCalendarToday
+        [(viewDate)]="viewDate"
+      >
+        Today
+      </div>
+      <div
+        class="btn btn-primary"
+        mwlCalendarNextView
+        [view]="view"
+        [(viewDate)]="viewDate"
+        (viewDateChange)="closeOpenMonthViewDay()"
+      >
+        Next
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <h2>{{ viewDate | calendarDate:(view + 'ViewTitle'):'en' }}</h2>
+  </div>
+  <div class="col-md-4">
+    <div class="btn-group">
+      <div
+        class="btn btn-primary"
+        (click)="setView(CalendarView.Month)"
+        [class.active]="view === CalendarView.Month"
+      >
+        Month
+      </div>
+      <div
+        class="btn btn-primary"
+        (click)="setView(CalendarView.Week)"
+        [class.active]="view === CalendarView.Week"
+      >
+        Week
+      </div>
+      <div
+        class="btn btn-primary"
+        (click)="setView(CalendarView.Day)"
+        [class.active]="view === CalendarView.Day"
+      >
+        Day
+      </div>
+    </div>
+  </div>
+  <br/>
+  <div [ngSwitch]="view">
+    <ng-template let-isOpen="isOpen" #customOpenDayTemplate>
+      <div class="my-open-events" [@collapse] *ngIf="isOpen" style="padding: 10px">
+        <h4>Actions:</h4>
+        <span>Add attendance</span>
+        <button mat-button color="primary" (click)="open(attendanceModal)">
+          <mat-icon>access_time</mat-icon>
+        </button>
+      </div>
+    </ng-template>
+    <mwl-calendar-month-view
+      *ngSwitchCase="CalendarView.Month"
+      [viewDate]="viewDate"
+      [activeDayIsOpen]="activeDayIsOpen"
+      (dayClicked)="dayClicked($event.day)"
+      [openDayEventsTemplate]="customOpenDayTemplate"
+    >
+    </mwl-calendar-month-view>
+    <mwl-calendar-week-view
+      *ngSwitchCase="CalendarView.Week"
+      [viewDate]="viewDate"
+    >
+    </mwl-calendar-week-view>
+    <mwl-calendar-day-view
+      *ngSwitchCase="CalendarView.Day"
+      [viewDate]="viewDate"
+    >
+    </mwl-calendar-day-view>
+  </div>
 </div>
+
+<ng-template #attendanceModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Attendance</h4>
+    <button mat-icon-button (click)="modal.dismiss('Cross click')">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+  <div  class="modal-body" style="width: auto">
+    <div>
+    <mat-form-field>
+      <mat-label>Check in</mat-label>
+      <input matInput>
+    </mat-form-field>
+    <button color="primary" mat-icon-button>
+      <mat-icon>timelapse</mat-icon>
+    </button>
+    </div>
+    <div>
+    <mat-form-field>
+      <mat-label>Check out</mat-label>
+      <input matInput>
+    </mat-form-field>
+    <button color="primary" mat-icon-button>
+      <mat-icon>timelapse</mat-icon>
+    </button>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button mat-raised-button color="primary" (click)="modal.close('Save click')">Save</button>
+  </div>
+</ng-template>
+
