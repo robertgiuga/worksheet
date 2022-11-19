@@ -1,69 +1,47 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import {HttpClient, HttpErrorResponse, HttpHeaders} from '@angular/common/http';
 import { Router } from '@angular/router';
 import { catchError, tap } from 'rxjs/operators';
-import { throwError} from 'rxjs';
+import {BehaviorSubject, throwError} from 'rxjs';
 import {User} from "../../model/User";
 
 
 export interface AuthResponseData {
-  kind: string;
-  idToken: string;
-  email: string;
-  refreshToken: string;
+  token: string;
   expiresIn: string;
-  localId: string;
-  registered?: boolean;
+  fullName: string;
+  role: string;
 }
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  user:User = {};
+  user= new BehaviorSubject<User>({});
   private tokenExpirationTimer: any;
 
   constructor(private http: HttpClient, private router: Router) {}
 
-  signup(email: string, password: string) {
-    return this.http
-      .post<AuthResponseData>(
-        'toadd',
-        {
-          email: email,
-          password: password,
-          returnSecureToken: true
-        }
-      )
-      .pipe(
-        catchError(this.handleError),
-        tap(resData => {
-          this.handleAuthentication(
-            resData.email,
-            resData.localId,
-            resData.idToken,
-            +resData.expiresIn
-          );
-        })
-      );
-  }
-
   login(email: string, password: string) {
+    let myHeaders= new HttpHeaders();
+    myHeaders.append("Content-Type","application/json");
+    myHeaders.append('Access-Control-Allow-Origin', 'http://localhost:5000');
     return this.http
       .post<AuthResponseData>(
-        'toadd',
+        'http://localhost:5000/api/authenticate',
         {
-          email: email,
-          password: password,
-          returnSecureToken: true
-        }
+          Email: email,
+          Password: password,
+        },
+        {headers: myHeaders}
       )
       .pipe(
         catchError(this.handleError),
         tap(resData => {
           this.handleAuthentication(
-            resData.email,
-            resData.localId,
-            resData.idToken,
-            +resData.expiresIn
+            email,
+            resData.token,
+            +resData.expiresIn,
+            resData.fullName,
+            resData.role
           );
         })
       );
@@ -75,30 +53,31 @@ export class AuthService {
     }
     const userData: {
       email: string;
-      id: string;
-      _token: string;
-      _tokenExpirationDate: string;
+      token: string;
+      tokenExpirationDate: string;
+      fullName: string;
+      role: string;
     } = JSON.parse(localStorage.getItem('userData') || '{}');
 
     const loadedUser:User=
     {
       email: userData.email,
-      userId:userData.id,
-      token:  userData._token,
-      tokenExpirationDate: new Date(userData._tokenExpirationDate)
+      token:  userData.token,
+      tokenExpirationDate: new Date(userData.tokenExpirationDate),
+      fullName: userData.fullName,
+      role: userData.role
     };
-
     if (loadedUser.token) {
-      this.user=loadedUser
+      this.user.next(loadedUser);
       const expirationDuration =
-        new Date(userData._tokenExpirationDate).getTime() -
+        new Date(userData.tokenExpirationDate).getTime() -
         new Date().getTime();
       this.autoLogout(expirationDuration);
     }
   }
 
   logout() {
-    this.user={};
+    this.user.next({});
     this.router.navigate(['/login']);
     localStorage.removeItem('userData');
     if (this.tokenExpirationTimer) {
@@ -114,15 +93,16 @@ export class AuthService {
   }
 
   private handleAuthentication(
-    email: string,
-    userId: string,
+    email:string,
     token: string,
-    expiresIn: number
+    expiresIn: number,
+    fullName: string,
+    role: string
   ) {
-    const expirationDate = new Date(new Date().getTime() + expiresIn * 1000);
-    const user:User = {email: email, userId: userId, token: token, tokenExpirationDate: expirationDate};
-    this.user=user;
-    this.autoLogout(expiresIn * 1000);
+    const expirationDate = new Date(Date.now() + expiresIn*60000);
+    const user:User = {email, token: token, tokenExpirationDate: expirationDate, fullName:fullName, role:role};
+    this.user.next(user);
+    this.autoLogout(expiresIn*60000);
     localStorage.setItem('userData', JSON.stringify(user));
   }
 
@@ -143,5 +123,9 @@ export class AuthService {
         break;
     }
     return throwError(()=>errorMessage);
+  }
+  checkTokenExist(){
+    return localStorage.getItem('userData');
+
   }
 }

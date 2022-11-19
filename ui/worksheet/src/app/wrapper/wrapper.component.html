@@ -1,32 +1,48 @@
-<mat-sidenav-container >
+<mat-sidenav-container fxFlexFill>
   <mat-sidenav #sidenav [mode]="sidenavMode" opened class=".mysidenav">
-    <mat-nav-list>
+    <mat-nav-list class="my-list">
       <img alt="company logo" fxLayoutAlign="center center"
            src="https://seeklogo.com/images/B/business-company-logo-C561B48365-seeklogo.com.png">
-      <mat-list-item class="my-list">
-        <button mat-button color="primary">
-          <mat-icon>home</mat-icon>
-        </button>
-        <span>Home</span>
-      </mat-list-item>
-      <mat-list-item>
-        <button mat-button color="primary">
-          <mat-icon>dashboard</mat-icon>
-        </button>
-         <span>Dashboard</span>
-      </mat-list-item>
-      <mat-list-item>
-        <button mat-button color="primary">
-          <mat-icon>perm_identity</mat-icon>
-        </button>
-        <span>Manage Employees</span>
-      </mat-list-item>
-      <mat-list-item>
-        <button mat-button color="primary">
-          <mat-icon>library_books</mat-icon>
-        </button>
-        <span>Reports</span>
-      </mat-list-item>
+      <a routerLink="/calendar">
+        <mat-list-item class="my-list">
+          <button disabled mat-button color="primary">
+            <mat-icon color="primary">home</mat-icon>
+          </button>
+          <span>Home</span>
+        </mat-list-item>
+      </a>
+      <a routerLink="/dashboard">
+        <mat-list-item>
+          <button disabled mat-button color="primary">
+            <mat-icon color="primary">dashboard</mat-icon>
+          </button>
+          <span>Dashboard</span>
+        </mat-list-item>
+      </a>
+      <a *ngIf="user.role=='admin'" routerLink="/activities">
+        <mat-list-item>
+          <button disabled mat-button color="primary" routerLink="/activities">
+            <mat-icon color="primary">local_activity</mat-icon>
+          </button>
+          <span>Manage activities</span>
+        </mat-list-item>
+      </a>
+      <a *ngIf="user.role=='admin'" routerLink="/employees">
+        <mat-list-item>
+          <button disabled mat-button color="primary">
+            <mat-icon color="primary">perm_identity</mat-icon>
+          </button>
+          <span>Manage Employees</span>
+        </mat-list-item>
+      </a>
+      <a *ngIf="user.role=='admin'" routerLink="/reports">
+        <mat-list-item>
+          <button disabled mat-button color="primary">
+            <mat-icon color="primary">library_books</mat-icon>
+          </button>
+          <span>Reports</span>
+        </mat-list-item>
+      </a>
     </mat-nav-list>
   </mat-sidenav>
   <mat-sidenav-content>

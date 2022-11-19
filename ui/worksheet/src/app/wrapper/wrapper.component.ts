@@ -1,5 +1,8 @@
 import {Component, HostListener, OnInit, ViewChild} from '@angular/core';
 import {MatDrawerMode} from "@angular/material/sidenav";
+import {Router} from "@angular/router";
+import {AuthService} from "../auth/auth.service";
+import {User} from "../../model/User";
 
 @Component({
   selector: 'app-wrapper',
@@ -8,22 +11,29 @@ import {MatDrawerMode} from "@angular/material/sidenav";
 })
 export class WrapperComponent implements OnInit {
 
-  @ViewChild("sidenav",{ static: false }) sidenav;
-  sidenavMode:MatDrawerMode="side";
-  constructor() { }
+  @ViewChild("sidenav", {static: false}) sidenav;
+  sidenavMode: MatDrawerMode = "side";
+  user: User = {};
+
+  constructor(private router: Router, private authService: AuthService) {
+  }
 
   ngOnInit(): void {
+    this.authService.user.subscribe(user => {
+        this.user = user;
+      }
+    );
   }
 
   @HostListener('window:resize', ['$event'])
   onResize(event: { target: { innerWidth: number; }; }) {
     if (event.target.innerWidth < 800) {
       this.sidenav.close();
-      this.sidenavMode="over";
+      this.sidenavMode = "over";
     }
     if (event.target.innerWidth > 800) {
       this.sidenav.open();
-      this.sidenavMode="side";
+      this.sidenavMode = "side";
     }
   }
 

@@ -4,18 +4,30 @@
     <img alt="company logo" fxLayoutAlign="center center"
          src="https://seeklogo.com/images/B/business-company-logo-C561B48365-seeklogo.com.png">
     <p>Welcome</p>
-    <form fxLayout="column">
+    <form #authForm="ngForm" (ngSubmit)="login(authForm)" fxLayout="column">
       <mat-form-field>
-        <mat-label>User Name</mat-label>
-        <input matInput>
+        <mat-label >User Name</mat-label>
+        <input matInput type="email"
+               id="email"
+               ngModel
+               name="email"
+               required>
       </mat-form-field>
       <mat-form-field>
         <mat-label>Password</mat-label>
-        <input matInput="password">
+        <input matInput="password"
+               required
+               ngModel
+               name="password"
+               type="password"
+               id="password">
       </mat-form-field>
-      <button mat-raised-button color="primary">Login</button>
-      <button mat-raised-button color="primary">Sing up</button>
+      <button [disabled]="!authForm.valid" type="submit" mat-raised-button color="primary">Login</button>
+      <mat-error *ngIf="error">{{error}}</mat-error>
       <button mat-button>Forgot password?</button>
     </form>
   </mat-card>
+</div>
+<div fxFlexFill fxLayout="column" fxLayoutAlign="center center" *ngIf="isLoading">
+  <mat-spinner style="align-content: center"></mat-spinner>
 </div>

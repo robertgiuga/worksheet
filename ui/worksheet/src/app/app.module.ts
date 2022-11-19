@@ -20,6 +20,13 @@ import {MatIconModule} from "@angular/material/icon";
 import { WrapperComponent } from './wrapper/wrapper.component';
 import {MatSidenavModule} from "@angular/material/sidenav";
 import {MatListModule} from "@angular/material/list";
+import { ActivitiesComponent } from './activities/activities.component';
+import { EmployeesComponent } from './employees/employees.component';
+import {FormsModule} from "@angular/forms";
+import { HttpClientModule } from '@angular/common/http';
+import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
+import { DashboardComponent } from './dashboard/dashboard.component';
+import { ReportsComponent } from './reports/reports.component';
 
 @NgModule({
   declarations: [
@@ -27,6 +34,10 @@ import {MatListModule} from "@angular/material/list";
     AuthComponent,
     CalendarComponent,
     WrapperComponent,
+    ActivitiesComponent,
+    EmployeesComponent,
+    DashboardComponent,
+    ReportsComponent,
   ],
   imports: [
     BrowserModule,
@@ -43,7 +54,10 @@ import {MatListModule} from "@angular/material/list";
     MatMenuModule,
     MatIconModule,
     MatSidenavModule,
-    MatListModule
+    MatListModule,
+    FormsModule,
+    HttpClientModule,
+    MatProgressSpinnerModule
   ],
   providers: [],
   bootstrap: [AppComponent]
