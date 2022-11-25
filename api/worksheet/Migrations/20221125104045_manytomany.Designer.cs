@@ -2,34 +2,21 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using worksheet.Context;
 
 namespace worksheet.Migrations
 {
     [DbContext(typeof(WorksheetContext))]
-    partial class WorksheetContextModelSnapshot : ModelSnapshot
+    [Migration("20221125104045_manytomany")]
+    partial class manytomany
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "5.0.17");
-
-            modelBuilder.Entity("ActivityUser", b =>
-                {
-                    b.Property<int>("ActivitiesId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("UsersId")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("ActivitiesId", "UsersId");
-
-                    b.HasIndex("UsersId");
-
-                    b.ToTable("ActivityUser");
-                });
+                .HasAnnotation("ProductVersion", "3.1.31");
 
             modelBuilder.Entity("worksheet.Models.Activity", b =>
                 {
@@ -39,13 +26,13 @@ namespace worksheet.Migrations
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("TEXT")
+                        .HasMaxLength(200);
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("TEXT")
+                        .HasMaxLength(50);
 
                     b.HasKey("Id");
 
@@ -82,26 +69,26 @@ namespace worksheet.Migrations
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("TEXT")
+                        .HasMaxLength(50);
 
                     b.Property<string>("GivenName")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("TEXT")
+                        .HasMaxLength(50);
 
                     b.Property<string>("Password")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("TEXT")
+                        .HasMaxLength(50);
 
                     b.Property<int>("Role")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Surname")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("TEXT")
+                        .HasMaxLength(50);
 
                     b.HasKey("Id");
 
@@ -111,19 +98,19 @@ namespace worksheet.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("ActivityUser", b =>
+            modelBuilder.Entity("worksheet.Models.UserActivity", b =>
                 {
-                    b.HasOne("worksheet.Models.Activity", null)
-                        .WithMany()
-                        .HasForeignKey("ActivitiesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Property<int>("UserId")
+                        .HasColumnType("INTEGER");
 
-                    b.HasOne("worksheet.Models.User", null)
-                        .WithMany()
-                        .HasForeignKey("UsersId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Property<int>("ActivityId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("UserId", "ActivityId");
+
+                    b.HasIndex("ActivityId");
+
+                    b.ToTable("UserActivities");
                 });
 
             modelBuilder.Entity("worksheet.Models.Attendance", b =>
@@ -131,13 +118,21 @@ namespace worksheet.Migrations
                     b.HasOne("worksheet.Models.User", "User")
                         .WithMany("Attendances")
                         .HasForeignKey("UserId");
-
-                    b.Navigation("User");
                 });
 
-            modelBuilder.Entity("worksheet.Models.User", b =>
+            modelBuilder.Entity("worksheet.Models.UserActivity", b =>
                 {
-                    b.Navigation("Attendances");
+                    b.HasOne("worksheet.Models.Activity", "Activity")
+                        .WithMany("UserActivities")
+                        .HasForeignKey("ActivityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("worksheet.Models.User", "User")
+                        .WithMany("UserActivities")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

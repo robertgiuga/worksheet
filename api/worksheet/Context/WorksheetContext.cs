@@ -19,13 +19,12 @@ namespace worksheet.Context
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<UserActivity>().HasKey(ua => new { ua.UserId, ua.ActivityId });
+
             modelBuilder.Entity<User>().HasIndex(u => u.Email).IsUnique();
         }
 
         public DbSet<User> Users { get; set; }
         public DbSet<Activity> Activities { get; set; }
         public DbSet<Attendance> Attendances { get; set; }
-        public DbSet<UserActivity> UserActivities { get; set; }
     }
 }

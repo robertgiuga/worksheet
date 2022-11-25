@@ -55,7 +55,7 @@ namespace worksheet.Controllers
                 GivenName= user.GivenName,
                 Surname= user.Surname,
                 Password= _passwordHasher.Hash(user.Password),
-                Role= UserRoles.admin
+                Role= UserRoles.user
             });
             _worksheetContext.SaveChangesAsync();
             return Ok();

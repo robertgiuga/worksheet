@@ -39,7 +39,11 @@ namespace worksheet
             services.AddSingleton<IPasswordHasher, PasswordHasher>();
             services.AddScoped<IAuthService, AuthService>();
 
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            services.AddAuthentication(options=> {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
                 .AddJwtBearer(options => {
                     options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
                     {
@@ -53,7 +57,8 @@ namespace worksheet
                     };
                 });
             services.AddMvc();
-            services.AddControllers();
+            services.AddControllersWithViews().AddNewtonsoftJson(options => 
+            options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

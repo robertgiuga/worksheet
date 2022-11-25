@@ -20,6 +20,7 @@ namespace worksheet.Services
         private readonly WorksheetContext _worksheetContext;
         private readonly IPasswordHasher _passwordHasher;
         private readonly IConfiguration _config;
+        private const int tokenExpireTime= 15;
 
         public AuthService(WorksheetContext worksheetContext, IPasswordHasher passwordHasher, IConfiguration config)
         {
@@ -38,7 +39,7 @@ namespace worksheet.Services
                 return null;
 
 
-            return (GenerateToken(user), 15, user);
+            return (GenerateToken(user), tokenExpireTime, user);
         }
 
         private string GenerateToken(User user)
@@ -58,7 +59,7 @@ namespace worksheet.Services
             var token = new JwtSecurityToken(_config["Jwt:Issuer"],
                 _config["Jwt:Audience"],
                 claims,
-                expires: DateTime.Now.AddMinutes(15),
+                expires: DateTime.Now.AddMinutes(tokenExpireTime),
                 signingCredentials: credentials
                 );
 

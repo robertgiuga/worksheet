@@ -17,6 +17,7 @@ namespace worksheet.Models
         [MaxLength(200)]
         public string Description { get; set; }
 
-        public List<UserActivity> UserActivities { get; set; }
+        public List<User> Users { get; set; } = new List<User>();
+
     }
 }

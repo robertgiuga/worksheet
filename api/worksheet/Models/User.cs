@@ -22,8 +22,8 @@ namespace worksheet.Models
         [MaxLength(50)]
         public string GivenName { get; set; }
         public UserRoles Role { get; set; }
-        public List<UserActivity> UserActivities { get; set; }
-        public List<Attendance> Attendances { get; set; }
+        public List<Activity> Activities { get; set; } = new List<Activity>();
+        public List<Attendance> Attendances { get; set; } = new List<Attendance>();
 
         public override bool Equals(object obj)
         {
