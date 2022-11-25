@@ -27,6 +27,8 @@ import { HttpClientModule } from '@angular/common/http';
 import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { ReportsComponent } from './reports/reports.component';
+import {MatTableModule} from "@angular/material/table";
+import {MatSelectModule} from "@angular/material/select";
 
 @NgModule({
   declarations: [
@@ -57,7 +59,9 @@ import { ReportsComponent } from './reports/reports.component';
     MatListModule,
     FormsModule,
     HttpClientModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    MatTableModule,
+    MatSelectModule
   ],
   providers: [],
   bootstrap: [AppComponent]
