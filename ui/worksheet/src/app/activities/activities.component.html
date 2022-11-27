@@ -1,4 +1,7 @@
 <div fxFlexFill style="padding: 20px" *ngIf="!isFetching && !isError">
+  <button mat-raised-button color="primary" (click)="onAdd(addModal)">
+    Add new Activity
+  </button>
   <table fxFlexFill mat-table [dataSource]="datasource">
 
     <!-- Position Column -->
@@ -47,10 +50,12 @@
     </button>
   </div>
   <div class="modal-body" style="width: auto">
-    <p style="font-size: 20px; font-weight: bold">Are you sure?</p>
+    <form (ngSubmit)="deleteActivity(selectedActivity.id?selectedActivity.id:-1)" id="deleteForm">
+      <p style="font-size: 20px; font-weight: bold">Are you sure?</p>
+    </form>
   </div>
   <div class="modal-footer">
-    <button mat-raised-button color="warn" (click)="modal.close('Delete')">Yes</button>
+    <button mat-raised-button color="warn" type="submit" form="deleteForm" (click)="modal.close('Delete')">Yes</button>
     |
     <button mat-raised-button color="primary" (click)="modal.close()">No</button>
   </div>
@@ -58,35 +63,84 @@
 
 
 <ng-template #updateModal let-modal>
-  <div class="modal-header">
-    <h4 class="modal-title" id="update-modal">Update {{selectedActivity.name}} activity?</h4>
-    <button mat-icon-button (click)="modal.dismiss()" color="warn">
-      <mat-icon>close</mat-icon>
-    </button>
-  </div>
-  <div class="modal-body" style="width: auto">
-      <mat-form-field fxFlexFill>
-        <mat-label>Name</mat-label>
-        <input matInput [defaultValue]="selectedActivity.name">
-      </mat-form-field>
+  <div *ngIf="!isActivityFetching && !isActivityError">
+    <div class="modal-header">
+      <h4 class="modal-title" id="update-modal">Update {{selectedActivity.name}} activity?</h4>
+      <button mat-icon-button (click)="modal.dismiss()" color="warn">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+    <div class="modal-body" style="width: auto">
+      <form #updateForm="ngForm" (ngSubmit)="updateActivity(updateForm)">
+        <mat-form-field fxFlexFill>
+          <mat-label>Name</mat-label>
+          <input matInput name="name" [ngModel]="selectedActivity.name" required>
+        </mat-form-field>
 
-      <mat-form-field fxFlexFill>
-        <mat-label>Description</mat-label>
-        <textarea matInput [defaultValue]="selectedActivity.description"></textarea>
-      </mat-form-field>
+        <mat-form-field fxFlexFill>
+          <mat-label>Description</mat-label>
+          <textarea matInput [ngModel]="selectedActivity.description" name="description" required></textarea>
+        </mat-form-field>
 
-      <mat-label>Users having this activity:</mat-label>
-      <mat-selection-list class="myList">
-        <mat-list-option *ngFor="let user of activityUsers" [(selected)]="user.isHaving">
-          {{user.displayName}}
-        </mat-list-option>
-        <mat-list-option *ngFor="let user of nonActivityUsers" [(selected)]="user.isHaving">
-          {{user.displayName}}
-        </mat-list-option>
-      </mat-selection-list>
+        <mat-label>Users having this activity:</mat-label>
+        <mat-selection-list class="myList">
+          <mat-list-option *ngFor="let user of activityUsers" [value]="user.id" [(selected)]="user.isHaving">
+            {{user.displayName}}
+          </mat-list-option>
+        </mat-selection-list>
+        <div class="modal-footer">
+          <button mat-raised-button color="primary" type="submit" (click)="modal.close('Save')" [disabled]="updateForm.invalid">Save</button>
+        </div>
+      </form>
+    </div>
   </div>
-  <div class="modal-footer">
-    <button mat-raised-button color="primary" (click)="modal.close('Save')">Save</button>
+  <div fxFlexFill fxLayoutAlign="center center" *ngIf="isActivityFetching && !isActivityError">
+    <mat-spinner style="align-content: center"></mat-spinner>
+  </div>
+  <div fxFlexFill fxLayoutAlign="center center" style="padding: 10px" *ngIf="isActivityError">
+    <p style="font-size: 30px">Some error occurred!</p>
+  </div>
+</ng-template>
+
+
+
+<ng-template #addModal let-modal>
+  <div *ngIf="!isAddFetching && !isAddError">
+    <div class="modal-header">
+      <h4 class="modal-title" id="add-modal">Add activity?</h4>
+      <button mat-icon-button (click)="modal.dismiss()" color="warn">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+    <div class="modal-body" style="width: auto">
+      <form #addForm="ngForm" (ngSubmit)="addActivity(addForm)">
+        <mat-form-field fxFlexFill>
+          <mat-label>Name</mat-label>
+          <input matInput name="name" ngModel required>
+        </mat-form-field>
+
+        <mat-form-field fxFlexFill>
+          <mat-label>Description</mat-label>
+          <textarea matInput ngModel name="description" required></textarea>
+        </mat-form-field>
+
+        <mat-label>Select users to have this activity:</mat-label>
+        <mat-selection-list class="myList">
+          <mat-list-option *ngFor="let user of addActivityUsers" [value]="user.id" [(selected)]="user.isHaving">
+            {{user.displayName}}
+          </mat-list-option>
+        </mat-selection-list>
+        <div class="modal-footer">
+          <button mat-raised-button color="primary" type="submit" (click)="modal.close('Save')" [disabled]="addForm.invalid">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <div fxFlexFill fxLayoutAlign="center center" *ngIf="isAddFetching && !isAddError">
+    <mat-spinner style="align-content: center"></mat-spinner>
+  </div>
+  <div fxFlexFill fxLayoutAlign="center center" style="padding: 10px" *ngIf="isAddError">
+    <p style="font-size: 30px">Some error occurred!</p>
   </div>
 </ng-template>
 

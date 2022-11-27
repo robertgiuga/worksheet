@@ -27,9 +27,28 @@ export class ActivityService{
 
   updateActivity(activity:Activity){
     return this.http.put(
-      'http://localhost:5000/api/activity/users/'+ activity.id,
+      'http://localhost:5000/api/activity/'+ activity.id,
       activity,
       {headers: new HttpHeaders({'Authorization': 'Bearer '+ this.user.token})}
     );
+  }
+
+  deleteActivity(activityId: number){
+    return this.http.delete(
+      'http://localhost:5000/api/activity/'+ activityId,
+      {headers: new HttpHeaders({'Authorization': 'Bearer '+ this.user.token})}
+    );
+  }
+
+  addActivity(activity: Activity){
+    return this.http.post(
+      'http://localhost:5000/api/activity/',
+      {
+        Name: activity.name,
+        Description: activity.description,
+        Users: activity.users
+      },
+      {headers: new HttpHeaders({'Authorization': 'Bearer '+ this.user.token})}
+      )
   }
 }

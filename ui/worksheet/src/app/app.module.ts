@@ -29,6 +29,7 @@ import { DashboardComponent } from './dashboard/dashboard.component';
 import { ReportsComponent } from './reports/reports.component';
 import {MatTableModule} from "@angular/material/table";
 import {MatSelectModule} from "@angular/material/select";
+import {MatSnackBarModule} from "@angular/material/snack-bar";
 
 @NgModule({
   declarations: [
@@ -61,7 +62,8 @@ import {MatSelectModule} from "@angular/material/select";
     HttpClientModule,
     MatProgressSpinnerModule,
     MatTableModule,
-    MatSelectModule
+    MatSelectModule,
+    MatSnackBarModule
   ],
   providers: [],
   bootstrap: [AppComponent]

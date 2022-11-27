@@ -4,7 +4,7 @@
       <img alt="company logo" fxLayoutAlign="center center"
            src="https://seeklogo.com/images/B/business-company-logo-C561B48365-seeklogo.com.png">
       <a routerLink="/calendar">
-        <mat-list-item class="my-list" [ngClass]="selected=='h'?'selected':''" (click)="selected='h'">
+        <mat-list-item class="my-list" routerLinkActive="selected">
           <button disabled mat-button color="primary">
             <mat-icon color="primary">home</mat-icon>
           </button>
@@ -12,7 +12,7 @@
         </mat-list-item>
       </a>
       <a routerLink="/dashboard" >
-        <mat-list-item [ngClass]="selected=='d'?'selected':''" (click)="selected='d'">
+        <mat-list-item  routerLinkActive="selected">
           <button disabled mat-button color="primary">
             <mat-icon color="primary">dashboard</mat-icon>
           </button>
@@ -20,7 +20,7 @@
         </mat-list-item>
       </a>
       <a *ngIf="user.role=='admin'" routerLink="/activities">
-        <mat-list-item (click)="selected='a'" [ngClass]="selected=='a'?'selected':''">
+        <mat-list-item  routerLinkActive="selected">
           <button disabled mat-button color="primary">
             <mat-icon color="primary">local_activity</mat-icon>
           </button>
@@ -28,7 +28,7 @@
         </mat-list-item>
       </a>
       <a *ngIf="user.role=='admin'" routerLink="/employees">
-        <mat-list-item (click)="selected='e'" [ngClass]="selected=='e'?'selected':''">
+        <mat-list-item  routerLinkActive="selected">
           <button disabled mat-button color="primary">
             <mat-icon color="primary">perm_identity</mat-icon>
           </button>
@@ -36,7 +36,7 @@
         </mat-list-item>
       </a>
       <a *ngIf="user.role=='admin'" routerLink="/reports">
-        <mat-list-item (click)="selected='r'" [ngClass]="selected=='r'?'selected':''">
+        <mat-list-item  routerLinkActive="selected">
           <button disabled mat-button color="primary">
             <mat-icon color="primary">library_books</mat-icon>
           </button>
