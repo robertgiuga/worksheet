@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using worksheet.Context;
 using worksheet.Dto;
+using worksheet.Services.Interfaces;
 
 namespace worksheet.Controllers
 {
@@ -16,17 +17,18 @@ namespace worksheet.Controllers
     public class UserController : ControllerBase
     {
 
-        private readonly WorksheetContext _worksheetContext;
+        private readonly IUserService _userService;
 
-        public UserController(WorksheetContext worksheetContext)
+        public UserController(IUserService userService)
         {
-            _worksheetContext = worksheetContext;
+            _userService = userService;
         }
 
         [HttpGet]
+        [Authorize(Roles = "admin")]
         public IActionResult getUsers()
         {
-            return Ok(_worksheetContext.Users.Select(u=> new UserDto {Id= u.Id, DisplayName = u.GivenName+" "+u.Surname, Email= u.Email }).ToList());
+            return Ok(_userService.GetUsers());
         }
     }
 }

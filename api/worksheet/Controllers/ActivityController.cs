@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using worksheet.Context;
 using worksheet.Dto;
 using worksheet.Models;
+using worksheet.Services.Interfaces;
 
 namespace worksheet.Controllers
 {
@@ -18,45 +19,55 @@ namespace worksheet.Controllers
 
     public class ActivityController : ControllerBase
     {
-        private readonly WorksheetContext _worksheetContext;
+        private readonly IActivityService _activityService;
 
-        public ActivityController(WorksheetContext worksheetContext)
+        public ActivityController(IActivityService activityService)
         {
-            _worksheetContext = worksheetContext;
+            _activityService = activityService;
         }
 
         [HttpGet]
-        public IActionResult getActivities()
+        [Authorize(Roles = "admin")]
+        public IActionResult GetActivities()
         {
 
-            return Ok(_worksheetContext.Activities.ToListAsync().Result);
+            return Ok(_activityService.GetActivities());
         }
 
         [HttpGet("{id}")]
-        public IActionResult getActivity(int id)
+        [Authorize(Roles = "admin")]
+        public IActionResult GetActivity(int id)
         {
-            return Ok(_worksheetContext.Activities.FirstOrDefaultAsync(a => a.Id == id).Result);
+            return Ok(_activityService.GetActivity(id));
         }
 
         [HttpGet("users/{id}")]
-        public IActionResult getActivityUsers(int id)
+        [Authorize(Roles = "admin")]
+        public IActionResult GetActivityUsers(int id)
         {
-
-            return Ok(_worksheetContext.Activities
-                .Where(a => a.Id == id)
-                .Include(a => a.Users).Select(a => a.Users.Select(
-                    u => new UserDto
-                    {
-                        Id= u.Id,
-                        DisplayName = u.GivenName + " " + u.Surname,
-                        Email = u.Email
-                    })).First());
+         
+            return Ok(_activityService.GetActivityUsers(id));
         }
 
         [HttpPut("{id}")]
-        public IActionResult updateActivity([FromBody] Activity activity)
+        [Authorize(Roles = "admin")]
+        public IActionResult UpdateActivity([FromBody] ActivityDto activity)
         {
-            return Ok(_worksheetContext.Activities.Update(activity));
+            return Ok(_activityService.UpdateActivity(activity));
+        }
+
+        [HttpDelete("{id}")]
+        [Authorize(Roles = "admin")]
+        public IActionResult DeleteActivity(int id)
+        {
+            return Ok(_activityService.DeleteActivity(id));
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "admin")]
+        public IActionResult AddActivity([FromBody] ActivityDto activityDto)
+        {
+            return Ok(_activityService.AddActivity(activityDto));
         }
     }
 }

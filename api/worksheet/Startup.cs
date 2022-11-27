@@ -38,6 +38,8 @@ namespace worksheet
 
             services.AddSingleton<IPasswordHasher, PasswordHasher>();
             services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IActivityService, ActivityService>();
 
             services.AddAuthentication(options=> {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

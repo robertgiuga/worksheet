@@ -5,7 +5,6 @@ using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using worksheet.Context;
 using worksheet.Dto;
 using worksheet.Models;
@@ -61,11 +60,5 @@ namespace worksheet.Controllers
             return Ok();
         }
 
-        [HttpGet("users")]
-        [Authorize(Roles = "admin")]
-        public IActionResult GetUsers()
-        {
-            return Ok(_worksheetContext.Users.ToArray());
-        }
     }
 }
