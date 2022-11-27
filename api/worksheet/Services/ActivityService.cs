@@ -48,7 +48,7 @@ namespace worksheet.Services
             return true;
         }
 
-        public List<ActivityDto> GetActivities()
+        public IEnumerable<ActivityDto> GetActivities()
         {
             return _worksheetContext.Activities.ToListAsync().Result.Select(a=> new ActivityDto(a)).ToList();
         }
@@ -58,7 +58,7 @@ namespace worksheet.Services
             return new ActivityDto(_worksheetContext.Activities.FirstOrDefaultAsync(a => a.Id == id).Result);
         }
 
-        public List<UserDto> GetActivityUsers(int id)
+        public IEnumerable<UserDto> GetActivityUsers(int id)
         {
             return _worksheetContext.Activities
                 .Where(a=>a.Id==id)

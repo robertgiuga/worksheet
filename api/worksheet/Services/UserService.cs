@@ -1,9 +1,11 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using worksheet.Context;
 using worksheet.Dto;
+using worksheet.Models;
 using worksheet.Services.Interfaces;
 
 namespace worksheet.Services
@@ -15,6 +17,16 @@ namespace worksheet.Services
         public UserService(WorksheetContext worksheetContext)
         {
             _worksheetContext = worksheetContext;
+        }
+
+        public IEnumerable<ActivityDto> GetCurrentUserActivities(User user)
+        {
+            return _worksheetContext.Users
+                 .Where(u => u.Id == user.Id)
+                 .Include(u => u.Activities)
+                 .FirstOrDefault()
+                 .Activities.Select(a => new ActivityDto(a))
+                 .ToList();
         }
 
         public IEnumerable<UserDto> GetUsers()

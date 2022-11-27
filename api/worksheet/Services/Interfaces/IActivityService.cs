@@ -8,16 +8,16 @@ namespace worksheet.Services.Interfaces
 {
     public interface IActivityService
     {
-        public List<ActivityDto> GetActivities();
+        IEnumerable<ActivityDto> GetActivities();
 
-        public ActivityDto? GetActivity(int id);
+        ActivityDto? GetActivity(int id);
 
-        public List<UserDto> GetActivityUsers(int id);
+        IEnumerable<UserDto> GetActivityUsers(int id);
 
-        public ActivityDto? UpdateActivity(ActivityDto activity);
+        ActivityDto? UpdateActivity(ActivityDto activity);
 
-        public bool DeleteActivity(int id);
+        bool DeleteActivity(int id);
 
-        public ActivityDto? AddActivity(ActivityDto activity);
+        ActivityDto? AddActivity(ActivityDto activity);
     }
 }
