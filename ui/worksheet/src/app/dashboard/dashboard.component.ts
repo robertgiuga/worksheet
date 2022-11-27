@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
+import {Activity} from "../../model/Activity";
+import {UserService} from "../employees/user.service";
 
 @Component({
   selector: 'app-dashboard',
@@ -7,9 +9,26 @@ import { Component, OnInit } from '@angular/core';
 })
 export class DashboardComponent implements OnInit {
 
-  constructor() { }
+  isError: boolean = false;
+  isFetching: boolean = false;
+  datasource: Activity[] = [];
+  displayedColumns: string[] = ['position', 'name', 'description'];
+
+  constructor(private userService: UserService) {
+  }
 
   ngOnInit(): void {
+    this.isFetching = true;
+    this.userService.getUserActivities().subscribe(value => {
+        this.datasource = value;
+        this.isFetching = false;
+        this.isError = false;
+      },
+      () => {
+        this.isFetching = false;
+        this.isError = true;
+      }
+    );
   }
 
 }

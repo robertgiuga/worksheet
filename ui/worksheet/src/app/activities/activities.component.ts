@@ -2,14 +2,14 @@ import {Component, OnInit} from '@angular/core';
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {Activity} from "../../model/Activity";
 import {ActivityService} from "./activity.service";
-import {UserDto} from "../../model/UserDto";
-import {UserService} from "../employees/user.service";
 import {User} from "../../model/User";
+import {UserService} from "../employees/user.service";
+import {UserLogin} from "../../model/UserLogin";
 import {NgForm} from "@angular/forms";
 import {MatSnackBar} from "@angular/material/snack-bar";
 
 
-interface ActivityUser extends UserDto {
+interface ActivityUser extends User {
   isHaving: boolean
 }
 
@@ -104,7 +104,7 @@ export class ActivitiesComponent implements OnInit {
     const updateActivity = this.selectedActivity;
     updateActivity.name = updateForm.value.name;
     updateActivity.description = updateForm.value.description;
-    updateActivity.users = newActivityUsers.map(value1 => <User>{id: value1.id});
+    updateActivity.users = newActivityUsers.map(value1 => <UserLogin>{id: value1.id});
     console.log(updateActivity);
     this.activityService.updateActivity(updateActivity).subscribe(() => {
         this.snackBar.open("Activity updated successfully", "Ok");
@@ -128,7 +128,7 @@ export class ActivitiesComponent implements OnInit {
     let activity: Activity = {
       name: addForm.value.name,
       description: addForm.value.description,
-      users: this.addActivityUsers.filter(value => value.isHaving).map(value => <UserDto>{id: value.id})
+      users: this.addActivityUsers.filter(value => value.isHaving).map(value => <User>{id: value.id})
     };
     this.activityService.addActivity(activity).subscribe(value => {
       this.datasource = [...this.datasource, value];

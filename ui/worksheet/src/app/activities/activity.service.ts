@@ -2,12 +2,12 @@ import {Injectable} from "@angular/core";
 import {HttpClient, HttpHeaders} from "@angular/common/http";
 import {Activity} from "../../model/Activity";
 import {AuthService} from "../auth/auth.service";
+import {UserLogin} from "../../model/UserLogin";
 import {User} from "../../model/User";
-import {UserDto} from "../../model/UserDto";
 
 @Injectable({providedIn:'root'})
 export class ActivityService{
-  user:User={};
+  user:UserLogin={};
   constructor(private http: HttpClient, private authService:AuthService) {
     authService.user.subscribe(value => this.user=value);
   }
@@ -19,7 +19,7 @@ export class ActivityService{
   }
 
   getActivityUsers(id:number){
-    return this.http.get<UserDto[]>(
+    return this.http.get<User[]>(
       'http://localhost:5000/api/activity/users/'+ id,
       {headers: new HttpHeaders({'Authorization': 'Bearer '+ this.user.token})}
     );

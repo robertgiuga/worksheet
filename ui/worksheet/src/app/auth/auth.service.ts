@@ -3,7 +3,7 @@ import {HttpClient, HttpErrorResponse, HttpHeaders} from '@angular/common/http';
 import { Router } from '@angular/router';
 import { catchError, tap } from 'rxjs/operators';
 import {BehaviorSubject, throwError} from 'rxjs';
-import {User} from "../../model/User";
+import {UserLogin} from "../../model/UserLogin";
 
 
 export interface AuthResponseData {
@@ -15,7 +15,7 @@ export interface AuthResponseData {
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  user= new BehaviorSubject<User>({});
+  user= new BehaviorSubject<UserLogin>({});
   private tokenExpirationTimer: any;
 
   constructor(private http: HttpClient, private router: Router) {}
@@ -59,7 +59,7 @@ export class AuthService {
       role: string;
     } = JSON.parse(localStorage.getItem('userData') || '{}');
 
-    const loadedUser:User=
+    const loadedUser:UserLogin=
     {
       email: userData.email,
       token:  userData.token,
@@ -100,7 +100,7 @@ export class AuthService {
     role: string
   ) {
     const expirationDate = new Date(Date.now() + expiresIn*60000);
-    const user:User = {email, token: token, tokenExpirationDate: expirationDate, fullName:fullName, role:role};
+    const user:UserLogin = {email, token: token, tokenExpirationDate: expirationDate, fullName:fullName, role:role};
     this.user.next(user);
     this.autoLogout(expiresIn*60000);
     localStorage.setItem('userData', JSON.stringify(user));

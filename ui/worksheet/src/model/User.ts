@@ -1,7 +1,5 @@
 export interface User {
+  id?: number
   email?: string,
-  token?: string,
-  tokenExpirationDate?: Date,
-  fullName?: string,
-  role?:string
+  displayName?: string
 }

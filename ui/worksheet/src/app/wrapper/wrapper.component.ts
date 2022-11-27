@@ -2,7 +2,7 @@ import {Component, HostListener, OnInit, ViewChild} from '@angular/core';
 import {MatDrawerMode} from "@angular/material/sidenav";
 import {Router} from "@angular/router";
 import {AuthService} from "../auth/auth.service";
-import {User} from "../../model/User";
+import {UserLogin} from "../../model/UserLogin";
 
 @Component({
   selector: 'app-wrapper',
@@ -13,7 +13,7 @@ export class WrapperComponent implements OnInit {
 
   @ViewChild("sidenav", {static: false}) sidenav;
   sidenavMode: MatDrawerMode = "side";
-  user: User = {};
+  user: UserLogin = {};
 
   constructor(private router: Router, private authService: AuthService) {
   }
