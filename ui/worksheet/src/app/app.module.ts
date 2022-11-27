@@ -30,6 +30,8 @@ import { ReportsComponent } from './reports/reports.component';
 import {MatTableModule} from "@angular/material/table";
 import {MatSelectModule} from "@angular/material/select";
 import {MatSnackBarModule} from "@angular/material/snack-bar";
+import {NgxMaterialTimepickerModule} from "ngx-material-timepicker";
+import {MatTooltipModule} from "@angular/material/tooltip";
 
 @NgModule({
   declarations: [
@@ -63,7 +65,9 @@ import {MatSnackBarModule} from "@angular/material/snack-bar";
     MatProgressSpinnerModule,
     MatTableModule,
     MatSelectModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    NgxMaterialTimepickerModule,
+    MatTooltipModule
   ],
   providers: [],
   bootstrap: [AppComponent]

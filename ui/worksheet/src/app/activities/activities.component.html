@@ -1,8 +1,11 @@
-<div fxFlexFill style="padding: 20px" *ngIf="!isFetching && !isError">
-  <button mat-raised-button color="primary" (click)="onAdd(addModal)">
-    Add new Activity
-  </button>
-  <table fxFlexFill mat-table [dataSource]="datasource">
+<div style="padding: 20px" *ngIf="!isFetching && !isError" class="myTable">
+  <div>
+    <button mat-raised-button color="primary" (click)="onAdd(addModal)">
+      Add new Activity
+    </button>
+  </div>
+  <br>
+  <table fxFill mat-table [dataSource]="datasource">
 
     <!-- Position Column -->
     <ng-container matColumnDef="position">
@@ -26,11 +29,11 @@
     <ng-container matColumnDef="actions">
       <th mat-header-cell *matHeaderCellDef> Actions</th>
       <td mat-cell *matCellDef="let element">
-        <button mat-icon-button color="primary" (click)="onEdit(updateModal, element)">
+        <button mat-icon-button color="primary" (click)="onEdit(updateModal, element)" matTooltip="edit activity">
           <mat-icon>edit</mat-icon>
         </button>
         |
-        <button mat-icon-button color="warn" (click)="onDelete(deleteModal, element)">
+        <button mat-icon-button color="warn" (click)="onDelete(deleteModal, element)" matTooltip="delete activity">
           <mat-icon>delete</mat-icon>
         </button>
       </td>
@@ -71,7 +74,7 @@
       </button>
     </div>
     <div class="modal-body" style="width: auto">
-      <form #updateForm="ngForm" (ngSubmit)="updateActivity(updateForm)">
+      <form #updateForm="ngForm" (ngSubmit)="updateActivity(updateForm)" id="updateForm">
         <mat-form-field fxFlexFill>
           <mat-label>Name</mat-label>
           <input matInput name="name" [ngModel]="selectedActivity.name" required>
@@ -88,10 +91,12 @@
             {{user.displayName}}
           </mat-list-option>
         </mat-selection-list>
-        <div class="modal-footer">
-          <button mat-raised-button color="primary" type="submit" (click)="modal.close('Save')" [disabled]="updateForm.invalid">Save</button>
-        </div>
       </form>
+    </div>
+    <div class="modal-footer">
+      <button mat-raised-button color="primary" type="submit" (click)="modal.close('Save')" form="updateForm"
+              [disabled]="updateForm.invalid">Save
+      </button>
     </div>
   </div>
   <div fxFlexFill fxLayoutAlign="center center" *ngIf="isActivityFetching && !isActivityError">
@@ -103,7 +108,6 @@
 </ng-template>
 
 
-
 <ng-template #addModal let-modal>
   <div *ngIf="!isAddFetching && !isAddError">
     <div class="modal-header">
@@ -113,7 +117,7 @@
       </button>
     </div>
     <div class="modal-body" style="width: auto">
-      <form #addForm="ngForm" (ngSubmit)="addActivity(addForm)">
+      <form #addForm="ngForm" (ngSubmit)="addActivity(addForm)" id="addForm">
         <mat-form-field fxFlexFill>
           <mat-label>Name</mat-label>
           <input matInput name="name" ngModel required>
@@ -130,10 +134,12 @@
             {{user.displayName}}
           </mat-list-option>
         </mat-selection-list>
-        <div class="modal-footer">
-          <button mat-raised-button color="primary" type="submit" (click)="modal.close('Save')" [disabled]="addForm.invalid">Save</button>
-        </div>
       </form>
+    </div>
+    <div class="modal-footer">
+      <button mat-raised-button color="primary" type="submit" form="addForm" (click)="modal.close('Save')"
+              [disabled]="addForm.invalid">Save
+      </button>
     </div>
   </div>
   <div fxFlexFill fxLayoutAlign="center center" *ngIf="isAddFetching && !isAddError">

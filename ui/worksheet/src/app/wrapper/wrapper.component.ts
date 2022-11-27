@@ -14,6 +14,7 @@ export class WrapperComponent implements OnInit {
   @ViewChild("sidenav", {static: false}) sidenav;
   sidenavMode: MatDrawerMode = "side";
   user: UserLogin = {};
+  username: string = ""
 
   constructor(private router: Router, private authService: AuthService) {
   }
@@ -21,6 +22,8 @@ export class WrapperComponent implements OnInit {
   ngOnInit(): void {
     this.authService.user.subscribe(user => {
         this.user = user;
+        console.log(user);
+        this.username = user.fullName ? user.fullName : "";
       }
     );
   }
@@ -35,6 +38,10 @@ export class WrapperComponent implements OnInit {
       this.sidenav.open();
       this.sidenavMode = "side";
     }
+  }
+
+  logOut() {
+    this.authService.logout();
   }
 
 }

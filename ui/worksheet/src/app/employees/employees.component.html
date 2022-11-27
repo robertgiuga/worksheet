@@ -1,3 +1,57 @@
-<div fxFlexFill>
-  <p>employees works!</p>
+<div *ngIf="!isFetching && !isError" class="myTable">
+
+  <div>
+    <button mat-raised-button color="primary">
+      Add new Employee
+    </button>
+    <span fxFlex></span>
+    <button mat-raised-button color="accent" >
+      Generate month activity report
+    </button>
+  </div>
+  <br>
+  <table fxFill mat-table [dataSource]="datasource">
+    <!-- Position Column -->
+    <ng-container matColumnDef="position">
+      <th mat-header-cell *matHeaderCellDef> No.</th>
+      <td mat-cell *matCellDef="let element; let i= index"> {{i + 1}} </td>
+    </ng-container>
+
+    <!-- Display Name Column -->
+    <ng-container matColumnDef="name">
+      <th mat-header-cell *matHeaderCellDef> Name</th>
+      <td mat-cell *matCellDef="let element"> {{element.name}} </td>
+    </ng-container>
+
+    <!--  Email Column -->
+    <ng-container matColumnDef="email">
+      <th mat-header-cell *matHeaderCellDef> Email</th>
+      <td mat-cell *matCellDef="let element"> {{element.description}} </td>
+    </ng-container>
+
+    <!--  Contract Date Column -->
+    <ng-container matColumnDef="contractDate">
+      <th mat-header-cell *matHeaderCellDef>Contract date</th>
+      <td mat-cell *matCellDef="let element"> {{element.description}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef> Actions</th>
+      <td mat-cell *matCellDef="let element">
+        <button mat-icon-button color="primary">
+          <mat-icon>edit</mat-icon>
+        </button>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>
+</div>
+
+<div fxFlexFill fxLayout="column" fxLayoutAlign="center center" *ngIf="isFetching && !isError">
+  <mat-spinner style="align-content: center"></mat-spinner>
+</div>
+
+<div fxFlexFill fxLayout="column" fxLayoutAlign="center center" *ngIf="isError">
+  <p style="font-size: 30px">Some error occurred!</p>
 </div>

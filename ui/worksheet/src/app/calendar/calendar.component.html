@@ -96,28 +96,48 @@
       <mat-icon>close</mat-icon>
     </button>
   </div>
-  <div  class="modal-body" style="width: auto">
-    <div>
-    <mat-form-field>
-      <mat-label>Check in</mat-label>
-      <input matInput>
-    </mat-form-field>
-    <button color="primary" mat-icon-button>
-      <mat-icon>timelapse</mat-icon>
-    </button>
-    </div>
-    <div>
-    <mat-form-field>
-      <mat-label>Check out</mat-label>
-      <input matInput>
-    </mat-form-field>
-    <button color="primary" mat-icon-button>
-      <mat-icon>timelapse</mat-icon>
-    </button>
-    </div>
+  <div class="modal-body" style="width: auto">
+    <form #attendanceForm="ngForm" (ngSubmit)="addAttendance()" id="attendanceForm">
+      <mat-form-field>
+        <mat-label>Check in</mat-label>
+        <mat-label>Time</mat-label>
+        <input
+          name="checkIn"
+          matInput
+          aria-label="default time"
+          [ngxTimepicker]="checkInTimeModal"
+          [format]="24"
+          [value]="'09:00'"
+          [(ngModel)]="checkIn"
+        />
+        <ngx-material-timepicker #checkInTimeModal>
+        </ngx-material-timepicker>
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Check out</mat-label>
+        <mat-label>Time</mat-label>
+        <input
+          name="checkOut"
+          matInput
+          aria-label="default time"
+          [ngxTimepicker]="checkOutTimeModal"
+          [format]="24"
+          [value]="'17:00'"
+          [(ngModel)]="checkOut"
+        />
+        <ngx-material-timepicker #checkOutTimeModal>
+        </ngx-material-timepicker>
+      </mat-form-field>
+    </form>
   </div>
   <div class="modal-footer">
-    <button mat-raised-button color="primary" (click)="modal.close('Save click')">Save</button>
+    <button mat-raised-button
+            color="primary"
+            (click)="modal.close('Save click')"
+            type="submit" form="attendanceForm">
+      Save
+    </button>
   </div>
 </ng-template>
 

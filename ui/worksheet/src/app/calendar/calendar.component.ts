@@ -16,6 +16,8 @@ export class CalendarComponent implements OnInit {
   activeDayIsOpen: boolean = true;
   CalendarView=CalendarView;
   closeResult = '';
+  checkIn = '09:00';
+  checkOut ='17:00';
   constructor(private modalService: NgbModal) { }
 
   ngOnInit(): void {
@@ -41,6 +43,9 @@ export class CalendarComponent implements OnInit {
         this.closeResult = `Closed with: ${result}`;
       },
     );
+  }
+  addAttendance(){
+
   }
 
 }

@@ -7,7 +7,6 @@ import {EmployeesComponent} from "./employees/employees.component";
 import {ActivitiesComponent} from "./activities/activities.component";
 import {AuthGuard} from "./auth/auth.guard";
 import {DashboardComponent} from "./dashboard/dashboard.component";
-import {ReportsComponent} from "./reports/reports.component";
 
 const routes: Routes = [
   { path: '', redirectTo: '/calendar', pathMatch: 'full' },
@@ -19,7 +18,7 @@ const routes: Routes = [
       { path: 'calendar', component: CalendarComponent },
       { path: 'dashboard', component: DashboardComponent },
       { path: 'manage-employees', component: CalendarComponent },
-      { path: 'reports', component: ReportsComponent },
+      // { path: 'reports', component: ReportsComponent },
       { path: 'employees', component: EmployeesComponent },
       { path: 'activities', component: ActivitiesComponent },
     ]
