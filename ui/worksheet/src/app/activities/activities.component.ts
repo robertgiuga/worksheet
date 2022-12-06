@@ -23,7 +23,7 @@ export class ActivitiesComponent implements OnInit {
   isError: boolean = false;
   isAddError: boolean = false;
   isActivityError: boolean = false;
-  isFetching: boolean = false;
+  isLoading: boolean = false;
   isAddFetching: boolean = false;
   isActivityFetching: boolean = false;
   displayedColumns: string[] = ['position', 'name', 'description', 'actions'];
@@ -39,13 +39,13 @@ export class ActivitiesComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.isFetching = true;
+    this.isLoading = true;
     this.activityService.getActivities().subscribe(value => {
       this.datasource = value;
-      this.isFetching = false;
+      this.isLoading = false;
     }, () => {
       this.isError = true;
-      this.isFetching = false;
+      this.isLoading = false;
     })
   }
 
@@ -101,23 +101,33 @@ export class ActivitiesComponent implements OnInit {
 
   updateActivity(updateForm: NgForm) {
     const newActivityUsers = this.activityUsers.filter(value1 => value1.isHaving);
-    const updateActivity = this.selectedActivity;
+    const updateActivity = JSON.parse(JSON.stringify(this.selectedActivity));
     updateActivity.name = updateForm.value.name;
     updateActivity.description = updateForm.value.description;
     updateActivity.users = newActivityUsers.map(value1 => <UserLogin>{id: value1.id});
-    this.activityService.updateActivity(updateActivity).subscribe(() => {
+    this.isLoading= true;
+    this.activityService.updateActivity(updateActivity).subscribe(value => {
         this.snackBar.open("Activity updated successfully", "Ok",{duration: 2000});
+        this.selectedActivity.name=value.name;
+        this.selectedActivity.description= value.description;
+        this.isLoading= false;
       },
-      () => this.snackBar.open("Some error occurred", "Ok", {duration: 2000})
+      () => {
+      this.snackBar.open("Some error occurred", "Ok", {duration: 2000})
+        this.isLoading= false;
+    }
     );
   }
 
   deleteActivity(id: number) {
+    this.isLoading= true;
     this.activityService.deleteActivity(id).subscribe(() => {
         this.datasource = this.datasource.filter(value1 => value1.id != id);
+        this.isLoading=false;
         this.snackBar.open("Activity deleted successfully", "Ok",{duration: 2000});
       },
       () => {
+        this.isLoading=false;
         this.snackBar.open("Some error occurred", "Ok",{duration: 2000});
       }
     );
@@ -129,11 +139,14 @@ export class ActivitiesComponent implements OnInit {
       description: addForm.value.description,
       users: this.addActivityUsers.filter(value => value.isHaving).map(value => <User>{id: value.id})
     };
+    this.isLoading=true;
     this.activityService.addActivity(activity).subscribe(value => {
       this.datasource = [...this.datasource, value];
+      this.isLoading= false;
       this.snackBar.open("Activity added successfully", "Ok",{duration: 2000});
     }, () => {
       this.snackBar.open("Some error occurred", "Ok",{duration: 2000});
+      this.isLoading= false;
     });
   }
 

@@ -18,7 +18,7 @@ interface ActivityUser extends Activity {
 })
 export class EmployeesComponent implements OnInit {
   isError: boolean = false;
-  isFetching: boolean = false;
+  isLoading: boolean = false;
   datasource: User[] = [];
   displayedColumns: string[] = ['position', 'name', 'email', 'actions'];
   selectedUser: User = {};
@@ -33,15 +33,15 @@ export class EmployeesComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.isFetching = true;
+    this.isLoading = true;
     this.userService.getUsers().subscribe(value => {
         this.datasource = value;
-        this.isFetching = false;
+        this.isLoading = false;
         this.isError = false
       },
       () => {
         this.isError = true;
-        this.isFetching = false
+        this.isLoading = false
       });
   }
 
@@ -86,15 +86,28 @@ export class EmployeesComponent implements OnInit {
 
   updateUser(updateForm: NgForm) {
     const newActivities = this.userActivities.filter(value => value.isHaving);
-    let updateUser = this.selectedUser;
+    let updateUser = JSON.parse(JSON.stringify(this.selectedUser));
     updateUser.email = updateForm.value.email;
     updateUser.givenName = updateForm.value.givenName;
     updateUser.surname = updateForm.value.surname;
     updateUser.role= updateForm.value.role;
     updateUser.displayName = updateUser.givenName + " " + updateUser.surname;
+    this.isLoading=true;
     this.userService.updateUser(updateUser, newActivities).subscribe(
-      () => this.snackBar.open("User updated successfully", "Ok", {duration: 2000})
-      , () => this.snackBar.open("Some error occurred", "Ok", {duration: 2000}));
+      value =>{
+        this.snackBar.open("User updated successfully", "Ok", {duration: 2000})
+        this.selectedUser.email= value.email;
+        this.selectedUser.surname= value.surname;
+        this.selectedUser.role= value.role;
+        this.selectedUser.displayName= value.displayName;
+        this.selectedUser.givenName= value.givenName;
+        console.log(this.selectedUser)
+        this.isLoading= false;
+      }
+      , () =>{
+        this.snackBar.open("Some error occurred", "Ok", {duration: 2000})
+        this.isLoading= false;
+      });
   }
 
   addUser(addForm: NgForm) {
@@ -105,9 +118,16 @@ export class EmployeesComponent implements OnInit {
       email: addForm.value.email,
       role: addForm.value.role
     }
+    this.isLoading= true;
     this.userService.addUser(user,userActivities).subscribe(
-      value => {this.datasource= [...this.datasource, value]; this.snackBar.open("User added successfully", "Ok",{duration: 2000});},
-      () => this.snackBar.open("Some error occurred", "Ok",{duration: 2000}));
+      value => {
+        this.datasource= [...this.datasource, value];
+        this.isLoading=false;
+        this.snackBar.open("User added successfully", "Ok",{duration: 2000});},
+      () =>{
+        this.snackBar.open("Some error occurred", "Ok",{duration: 2000})
+        this.isLoading=false;
+      });
   }
 
 

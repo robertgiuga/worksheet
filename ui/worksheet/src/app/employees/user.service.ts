@@ -35,7 +35,7 @@ export class UserService {
   }
 
   updateUser(user: User, userActivities: Activity[]) {
-    return this.http.put(
+    return this.http.put<User>(
       'http://localhost:5000/api/user/' + user.id,
       {
         Id: user.id,
@@ -50,7 +50,7 @@ export class UserService {
   }
 
   addUser(user: User, userActivities: Activity[]) {
-    return this.http.post(
+    return this.http.post<User>(
       'http://localhost:5000/api/user',
       {
         GivenName: user.givenName,

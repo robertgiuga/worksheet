@@ -1,4 +1,4 @@
-<div *ngIf="!isFetching && !isError" class="myTable">
+<div *ngIf="!isLoading && !isError" class="myTable">
 
   <div>
     <button mat-raised-button color="primary" (click)="onAdd(addModal)">
@@ -48,7 +48,7 @@
   </table>
 </div>
 
-<div fxFlexFill fxLayout="column" fxLayoutAlign="center center" *ngIf="isFetching && !isError">
+<div fxFlexFill fxLayout="column" fxLayoutAlign="center center" *ngIf="isLoading && !isError">
   <mat-spinner style="align-content: center"></mat-spinner>
 </div>
 

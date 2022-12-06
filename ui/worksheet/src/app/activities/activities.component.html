@@ -1,4 +1,4 @@
-<div style="padding: 20px" *ngIf="!isFetching && !isError" class="myTable">
+<div style="padding: 20px" *ngIf="!isLoading && !isError" class="myTable">
   <div>
     <button mat-raised-button color="primary" (click)="onAdd(addModal)">
       Add new Activity
@@ -150,7 +150,7 @@
   </div>
 </ng-template>
 
-<div fxFlexFill fxLayout="column" fxLayoutAlign="center center" *ngIf="isFetching && !isError">
+<div fxFlexFill fxLayout="column" fxLayoutAlign="center center" *ngIf="isLoading && !isError">
   <mat-spinner style="align-content: center"></mat-spinner>
 </div>
 

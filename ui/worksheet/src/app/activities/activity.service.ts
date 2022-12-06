@@ -26,7 +26,7 @@ export class ActivityService{
   }
 
   updateActivity(activity:Activity){
-    return this.http.put(
+    return this.http.put<Activity>(
       'http://localhost:5000/api/activity/'+ activity.id,
       activity,
       {headers: new HttpHeaders({'Authorization': 'Bearer '+ this.user.token})}
@@ -41,7 +41,7 @@ export class ActivityService{
   }
 
   addActivity(activity: Activity){
-    return this.http.post(
+    return this.http.post<Activity>(
       'http://localhost:5000/api/activity/',
       {
         Name: activity.name,
