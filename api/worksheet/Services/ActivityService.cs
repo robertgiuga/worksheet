@@ -19,12 +19,15 @@ namespace worksheet.Services
             _worksheetContext = worksheetContext;
         }
 
-        public ActivityDto AddActivity(ActivityDto activity)
+        public async Task<ActivityDto> AddActivityAsync(ActivityDto activity)
         {
             List<User> users = new();
             foreach (var u in activity.Users)
             {
-                users.Add(_worksheetContext.Users.Find(u.Id));
+                var result = await _worksheetContext.Users.FindAsync(u.Id);
+                if (result == null)
+                    return null;
+                users.Add(result);
             }
 
             var savedActivity = new Activity
@@ -33,57 +36,64 @@ namespace worksheet.Services
                 Name = activity.Name,
                 Users = users
             };
-            _worksheetContext.Activities.Add(savedActivity);
-            _worksheetContext.SaveChanges();
+            await _worksheetContext.Activities.AddAsync(savedActivity);
+            await _worksheetContext.SaveChangesAsync();
             return new ActivityDto(savedActivity);
         }
 
-        public bool DeleteActivity(int id)
+        public async Task<bool> DeleteActivityAsync(int id)
         {
-            var activityModel = _worksheetContext.Activities.Where(a => a.Id == id).Include(a => a.Users).FirstOrDefault();
+            var activityModel = await _worksheetContext.Activities.Where(a => a.Id == id).Include(a => a.Users).FirstOrDefaultAsync();
+            if (activityModel == null)
+                return false;
             activityModel.Users.Clear();
-            _worksheetContext.SaveChanges();
+            await _worksheetContext.SaveChangesAsync();
             _worksheetContext.Activities.Remove(activityModel);
-            _worksheetContext.SaveChanges();
+            await _worksheetContext.SaveChangesAsync();
             return true;
         }
 
-        public IEnumerable<ActivityDto> GetActivities()
+        public async Task<IEnumerable<ActivityDto>> GetActivitiesAsync()
         {
-            return _worksheetContext.Activities.ToListAsync().Result.Select(a=> new ActivityDto(a)).ToList();
+            return (await _worksheetContext.Activities.ToListAsync()).Select(a=> new ActivityDto(a)).ToList();
         }
 
-        public ActivityDto GetActivity(int id)
+        public async Task<ActivityDto> GetActivityAsync(int id)
         {
-            return new ActivityDto(_worksheetContext.Activities.FirstOrDefaultAsync(a => a.Id == id).Result);
+            return new ActivityDto(await _worksheetContext.Activities.FirstOrDefaultAsync(a => a.Id == id));
         }
 
-        public IEnumerable<UserDto> GetActivityUsers(int id)
+        public async Task<IEnumerable<UserDto>> GetActivityUsersAsync(int id)
         {
-            return _worksheetContext.Activities
+            return (await _worksheetContext.Activities
                 .Where(a=>a.Id==id)
                 .Include(a => a.Users)
-                .FirstOrDefault()
+                .FirstOrDefaultAsync())
                 .Users.Select(u=>new UserDto(u)).ToList();
         }
 
-        public ActivityDto UpdateActivity(ActivityDto activity)
+        public async Task<ActivityDto> UpdateActivityAsync(ActivityDto activity)
         {
             List<User> users = new();
             foreach (var u in activity.Users)
             {
-               users.Add(_worksheetContext.Users.Find(u.Id));
+                var result = await _worksheetContext.Users.FindAsync(u.Id);
+                if (result == null)
+                    return null;
+               users.Add(result);
             }
-            Activity activityModel = _worksheetContext.Activities.Where(a => a.Id == activity.Id)
+            Activity activityModel = await _worksheetContext.Activities.Where(a => a.Id == activity.Id)
                 .Include(a => a.Users)
-                .FirstOrDefault();
+                .FirstOrDefaultAsync();
+            if (activityModel == null)
+                return null;
             activityModel.Users.Clear();
-            _worksheetContext.SaveChanges();
+            await _worksheetContext.SaveChangesAsync();
             activityModel.Users = users;
             activityModel.Description = activity.Description;
             activityModel.Name = activity.Name;
             _worksheetContext.Activities.Update(activityModel);
-            _worksheetContext.SaveChanges();
+            await _worksheetContext.SaveChangesAsync();
             return new ActivityDto(activityModel);
         }
     }

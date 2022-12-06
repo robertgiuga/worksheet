@@ -9,7 +9,9 @@ namespace worksheet.Services.Interfaces
 {
     public interface IUserService
     {
-        IEnumerable<UserDto> GetUsers();
-        IEnumerable<ActivityDto> GetCurrentUserActivities(User user);
+        Task<IEnumerable<UserDto>> GetUsersAsync();
+        Task<IEnumerable<ActivityDto>> GetUserActivitiesAsync(int userId);
+        Task<UserDto?> UpdateUserAsync(UserDto user);
+        Task<UserDto?> AddUserAsync(UserDto user);
     }
 }

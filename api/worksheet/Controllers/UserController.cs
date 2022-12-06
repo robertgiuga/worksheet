@@ -28,15 +28,43 @@ namespace worksheet.Controllers
 
         [HttpGet]
         [Authorize(Roles = "admin")]
-        public IActionResult getUsers()
+        public async Task<IActionResult> GetUsersAsync()
         {
-            return Ok(_userService.GetUsers());
+            return Ok(await _userService.GetUsersAsync());
         }
 
         [HttpGet("activities")]
-        public IActionResult getCurrentUserActivities()
+        public async Task<IActionResult> GetCurrentUserActivitiesAsync()
         {
-            return Ok(_userService.GetCurrentUserActivities(GetCurrentUser()));
+            var rez =await _userService.GetUserActivitiesAsync(GetCurrentUser().Id);
+            return Ok(rez);
+        }
+
+        [HttpGet("{id}/activities")]
+        [Authorize(Roles = "admin")]
+        public async Task<IActionResult> GetUserActivitiesAsync(int id)
+        {
+            return Ok(await _userService.GetUserActivitiesAsync(id));
+        }
+
+        [HttpPut("{id}")]
+        [Authorize(Roles = "admin")]
+        public async Task<IActionResult> UpdateUserAsync([FromBody] UserDto user)
+        {
+            var result = await _userService.UpdateUserAsync(user);
+            if (result == null)
+                return Problem();
+            return Ok(result);
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "admin")]
+        public async Task<IActionResult> AddUserAsync([FromBody] UserDto user)
+        {
+            var result = await _userService.AddUserAsync(user);
+            if (result == null)
+                return Problem();
+            return Ok(result);
         }
 
         private User GetCurrentUser()

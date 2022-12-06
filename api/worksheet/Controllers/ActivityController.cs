@@ -28,46 +28,57 @@ namespace worksheet.Controllers
 
         [HttpGet]
         [Authorize(Roles = "admin")]
-        public IActionResult GetActivities()
+        public async Task<IActionResult> GetActivitiesAsync()
         {
-
-            return Ok(_activityService.GetActivities());
+            return Ok(await _activityService.GetActivitiesAsync());
         }
 
         [HttpGet("{id}")]
         [Authorize(Roles = "admin")]
-        public IActionResult GetActivity(int id)
+        public async Task<IActionResult> GetActivityAsync(int id)
         {
-            return Ok(_activityService.GetActivity(id));
+            var result = await _activityService.GetActivityAsync(id);
+            if (result == null)
+                return NotFound();
+            return Ok(result);
         }
 
         [HttpGet("users/{id}")]
         [Authorize(Roles = "admin")]
-        public IActionResult GetActivityUsers(int id)
+        public async Task<IActionResult> GetActivityUsersAsync(int id)
         {
          
-            return Ok(_activityService.GetActivityUsers(id));
+            return Ok(await _activityService.GetActivityUsersAsync(id));
         }
 
         [HttpPut("{id}")]
         [Authorize(Roles = "admin")]
-        public IActionResult UpdateActivity([FromBody] ActivityDto activity)
+        public async Task<IActionResult> UpdateActivityAsync([FromBody] ActivityDto activity)
         {
-            return Ok(_activityService.UpdateActivity(activity));
+            var result = await _activityService.UpdateActivityAsync(activity);
+            if (result == null)
+                return Problem();
+            return Ok(result);
         }
 
         [HttpDelete("{id}")]
         [Authorize(Roles = "admin")]
-        public IActionResult DeleteActivity(int id)
+        public async Task<IActionResult> DeleteActivityAsync(int id)
         {
-            return Ok(_activityService.DeleteActivity(id));
+            var result = await _activityService.DeleteActivityAsync(id);
+            if (result == false)
+                return Problem();
+            return Ok(result);
         }
 
         [HttpPost]
         [Authorize(Roles = "admin")]
-        public IActionResult AddActivity([FromBody] ActivityDto activityDto)
+        public async Task<IActionResult> AddActivityAsync([FromBody] ActivityDto activityDto)
         {
-            return Ok(_activityService.AddActivity(activityDto));
+            var result = await _activityService.AddActivityAsync(activityDto);
+            if (result == null)
+                return BadRequest();
+            return Ok(result);
         }
     }
 }
