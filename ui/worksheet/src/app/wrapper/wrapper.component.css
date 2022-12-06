@@ -6,7 +6,7 @@ img{
   margin-bottom: 10%;
 }
 .mysidenav{
-  width: 150px;
+  width: 200px;
 }
 @media (min-width: 800px) {
   .mysidenav{
@@ -15,7 +15,7 @@ img{
 }
 
 .my-list{
-  width: 150px;
+  width: 200px;
 }
 @media (min-width: 800px) {
   .my-list{

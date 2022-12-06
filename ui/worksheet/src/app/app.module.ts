@@ -22,7 +22,7 @@ import {MatSidenavModule} from "@angular/material/sidenav";
 import {MatListModule} from "@angular/material/list";
 import { ActivitiesComponent } from './activities/activities.component';
 import { EmployeesComponent } from './employees/employees.component';
-import {FormsModule} from "@angular/forms";
+import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import { HttpClientModule } from '@angular/common/http';
 import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
 import { DashboardComponent } from './dashboard/dashboard.component';
@@ -32,6 +32,7 @@ import {MatSelectModule} from "@angular/material/select";
 import {MatSnackBarModule} from "@angular/material/snack-bar";
 import {NgxMaterialTimepickerModule} from "ngx-material-timepicker";
 import {MatTooltipModule} from "@angular/material/tooltip";
+import {MatRadioModule} from "@angular/material/radio";
 
 @NgModule({
   declarations: [
@@ -67,7 +68,9 @@ import {MatTooltipModule} from "@angular/material/tooltip";
     MatSelectModule,
     MatSnackBarModule,
     NgxMaterialTimepickerModule,
-    MatTooltipModule
+    MatTooltipModule,
+    MatRadioModule,
+    ReactiveFormsModule
   ],
   providers: [],
   bootstrap: [AppComponent]

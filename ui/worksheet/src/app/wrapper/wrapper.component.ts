@@ -22,7 +22,6 @@ export class WrapperComponent implements OnInit {
   ngOnInit(): void {
     this.authService.user.subscribe(user => {
         this.user = user;
-        console.log(user);
         this.username = user.fullName ? user.fullName : "";
       }
     );

@@ -8,3 +8,7 @@ th{
   font-weight: bold;
   color: black;
 }
+.myList{
+  overflow: auto;
+  max-height: 150px;
+}

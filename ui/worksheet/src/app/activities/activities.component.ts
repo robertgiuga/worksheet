@@ -56,7 +56,7 @@ export class ActivitiesComponent implements OnInit {
     this.activityService.getActivityUsers(selectedActivity.id).subscribe(
       value => {
         this.activityUsers = value.map(value1 => <ActivityUser>({...value1, isHaving: true}))
-        this.userService.getUserDtos().subscribe(
+        this.userService.getUsers().subscribe(
           value => {
             this.activityUsers = this.activityUsers.concat(value
               .filter(value => !this.activityUsers.find(value1 => value1.email == value.email))
@@ -83,7 +83,7 @@ export class ActivitiesComponent implements OnInit {
   onAdd(content) {
     this.addActivityUsers = [];
     this.isAddFetching = true;
-    this.userService.getUserDtos().subscribe(
+    this.userService.getUsers().subscribe(
       value => {
         this.addActivityUsers =
           value.map(value1 => <ActivityUser>({...value1, isHaving: false}))
@@ -105,21 +105,20 @@ export class ActivitiesComponent implements OnInit {
     updateActivity.name = updateForm.value.name;
     updateActivity.description = updateForm.value.description;
     updateActivity.users = newActivityUsers.map(value1 => <UserLogin>{id: value1.id});
-    console.log(updateActivity);
     this.activityService.updateActivity(updateActivity).subscribe(() => {
-        this.snackBar.open("Activity updated successfully", "Ok");
+        this.snackBar.open("Activity updated successfully", "Ok",{duration: 2000});
       },
-      () => this.snackBar.open("Some error occurred", "Ok")
+      () => this.snackBar.open("Some error occurred", "Ok", {duration: 2000})
     );
   }
 
   deleteActivity(id: number) {
     this.activityService.deleteActivity(id).subscribe(() => {
         this.datasource = this.datasource.filter(value1 => value1.id != id);
-        this.snackBar.open("Activity deleted successfully", "Ok");
+        this.snackBar.open("Activity deleted successfully", "Ok",{duration: 2000});
       },
       () => {
-        this.snackBar.open("Some error occurred", "Ok");
+        this.snackBar.open("Some error occurred", "Ok",{duration: 2000});
       }
     );
   }
@@ -132,9 +131,9 @@ export class ActivitiesComponent implements OnInit {
     };
     this.activityService.addActivity(activity).subscribe(value => {
       this.datasource = [...this.datasource, value];
-      this.snackBar.open("Activity added successfully", "Ok");
+      this.snackBar.open("Activity added successfully", "Ok",{duration: 2000});
     }, () => {
-      this.snackBar.open("Some error occurred", "Ok");
+      this.snackBar.open("Some error occurred", "Ok",{duration: 2000});
     });
   }
 

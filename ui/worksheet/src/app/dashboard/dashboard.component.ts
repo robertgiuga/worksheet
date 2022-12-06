@@ -19,7 +19,7 @@ export class DashboardComponent implements OnInit {
 
   ngOnInit(): void {
     this.isFetching = true;
-    this.userService.getUserActivities().subscribe(value => {
+    this.userService.getLoggedUserActivities().subscribe(value => {
         this.datasource = value;
         this.isFetching = false;
         this.isError = false;

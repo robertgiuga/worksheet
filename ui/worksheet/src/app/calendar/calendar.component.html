@@ -98,7 +98,7 @@
   </div>
   <div class="modal-body" style="width: auto">
     <form #attendanceForm="ngForm" (ngSubmit)="addAttendance()" id="attendanceForm">
-      <mat-form-field>
+      <mat-form-field fxFlexFill>
         <mat-label>Check in</mat-label>
         <mat-label>Time</mat-label>
         <input
@@ -114,7 +114,7 @@
         </ngx-material-timepicker>
       </mat-form-field>
 
-      <mat-form-field>
+      <mat-form-field fxFlexFill>
         <mat-label>Check out</mat-label>
         <mat-label>Time</mat-label>
         <input
