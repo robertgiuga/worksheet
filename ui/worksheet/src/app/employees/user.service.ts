@@ -4,6 +4,7 @@ import {User} from "../../model/User";
 import {AuthService} from "../auth/auth.service";
 import {UserLogin} from "../../model/UserLogin";
 import {Activity} from "../../model/Activity";
+import {Attendance} from "../../model/Attendance";
 
 @Injectable({providedIn: 'root'})
 export class UserService {
@@ -59,6 +60,36 @@ export class UserService {
         Role: user.role,
         Activities: userActivities
       },
+      {headers: new HttpHeaders({'Authorization': 'Bearer ' + this.user.token})}
+    );
+  }
+
+  addCurrentUserAttendance(attendance: Attendance) {
+    return this.http.post<Attendance>(
+      'http://localhost:5000/api/attendance',
+      attendance,
+      {headers: new HttpHeaders({'Authorization': 'Bearer ' + this.user.token})}
+    );
+  }
+
+  getCurrentUserAttendance(date:string){
+    return this.http.get<Attendance[]>(
+      'http://localhost:5000/api/attendance/'+date,
+      {headers: new HttpHeaders({'Authorization': 'Bearer ' + this.user.token})}
+    );
+  }
+
+  deleteAttendance(id: number){
+    return this.http.delete(
+      'http://localhost:5000/api/attendance/'+ id,
+      {headers: new HttpHeaders({'Authorization': 'Bearer ' + this.user.token})}
+      );
+  }
+
+  updateAttendance(attendance:Attendance){
+    return this.http.put<Attendance>(
+      'http://localhost:5000/api/attendance',
+      attendance,
       {headers: new HttpHeaders({'Authorization': 'Bearer ' + this.user.token})}
     );
   }

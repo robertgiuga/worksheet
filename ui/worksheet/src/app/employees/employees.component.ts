@@ -85,7 +85,7 @@ export class EmployeesComponent implements OnInit {
   }
 
   updateUser(updateForm: NgForm) {
-    const newActivities = this.userActivities.filter(value => value.isHaving);
+    const newActivities = this.userActivities.filter(value => value.isHaving).map(value => <Activity>{id:value.id});
     let updateUser = JSON.parse(JSON.stringify(this.selectedUser));
     updateUser.email = updateForm.value.email;
     updateUser.givenName = updateForm.value.givenName;
@@ -111,7 +111,7 @@ export class EmployeesComponent implements OnInit {
   }
 
   addUser(addForm: NgForm) {
-    const userActivities = this.userActivities.filter(value => value.isHaving);
+    const userActivities = this.userActivities.filter(value => value.isHaving).map(value => <Activity>{id:value.id});
     let user: User = {
       surname: addForm.value.surname,
       givenName: addForm.value.givenName,

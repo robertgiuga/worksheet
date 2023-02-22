@@ -1,9 +1,11 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {HttpClient, HttpErrorResponse, HttpHeaders} from '@angular/common/http';
-import { Router } from '@angular/router';
-import { catchError, tap } from 'rxjs/operators';
+import {Router} from '@angular/router';
+import {catchError, tap} from 'rxjs/operators';
 import {BehaviorSubject, throwError} from 'rxjs';
 import {UserLogin} from "../../model/UserLogin";
+import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
+import {SpeechRecognitionService} from "../speech/speech-recognition.service";
 
 
 export interface AuthResponseData {
@@ -13,16 +15,17 @@ export interface AuthResponseData {
   role: string;
 }
 
-@Injectable({ providedIn: 'root' })
+@Injectable({providedIn: 'root'})
 export class AuthService {
-  user= new BehaviorSubject<UserLogin>({});
+  user = new BehaviorSubject<UserLogin>({});
   private tokenExpirationTimer: any;
 
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(private http: HttpClient, private router: Router, private modalService: NgbModal, private speechRecognitionService: SpeechRecognitionService) {
+  }
 
   login(email: string, password: string) {
-    let myHeaders= new HttpHeaders();
-    myHeaders.append("Content-Type","application/json");
+    let myHeaders = new HttpHeaders();
+    myHeaders.append("Content-Type", "application/json");
     myHeaders.append('Access-Control-Allow-Origin', 'http://localhost:5000');
     return this.http
       .post<AuthResponseData>(
@@ -59,14 +62,14 @@ export class AuthService {
       role: string;
     } = JSON.parse(localStorage.getItem('userData') || '{}');
 
-    const loadedUser:UserLogin=
-    {
-      email: userData.email,
-      token:  userData.token,
-      tokenExpirationDate: new Date(userData.tokenExpirationDate),
-      fullName: userData.fullName,
-      role: userData.role
-    };
+    const loadedUser: UserLogin =
+      {
+        email: userData.email,
+        token: userData.token,
+        tokenExpirationDate: new Date(userData.tokenExpirationDate),
+        fullName: userData.fullName,
+        role: userData.role
+      };
     if (loadedUser.token) {
       this.user.next(loadedUser);
       const expirationDuration =
@@ -78,6 +81,7 @@ export class AuthService {
 
   logout() {
     this.user.next({});
+    this.speechRecognitionService.setEndRecognition(true);
     this.router.navigate(['/login']);
     localStorage.removeItem('userData');
     if (this.tokenExpirationTimer) {
@@ -88,28 +92,29 @@ export class AuthService {
 
   autoLogout(expirationDuration: number) {
     this.tokenExpirationTimer = setTimeout(() => {
+      this.modalService.dismissAll();
       this.logout();
     }, expirationDuration);
   }
 
   private handleAuthentication(
-    email:string,
+    email: string,
     token: string,
     expiresIn: number,
     fullName: string,
     role: string
   ) {
-    const expirationDate = new Date(Date.now() + expiresIn*60000);
-    const user:UserLogin = {email, token: token, tokenExpirationDate: expirationDate, fullName:fullName, role:role};
+    const expirationDate = new Date(Date.now() + expiresIn * 60000);
+    const user: UserLogin = {email, token: token, tokenExpirationDate: expirationDate, fullName: fullName, role: role};
     this.user.next(user);
-    this.autoLogout(expiresIn*60000);
+    this.autoLogout(expiresIn * 60000);
     localStorage.setItem('userData', JSON.stringify(user));
   }
 
   private handleError(errorRes: HttpErrorResponse) {
     let errorMessage = 'An unknown error occurred!';
     if (!errorRes.error || !errorRes.error.error) {
-      return throwError(()=>errorMessage);
+      return throwError(() => errorMessage);
     }
     switch (errorRes.error.error.message) {
       case 'EMAIL_EXISTS':
@@ -122,9 +127,10 @@ export class AuthService {
         errorMessage = 'This password is not correct.';
         break;
     }
-    return throwError(()=>errorMessage);
+    return throwError(() => errorMessage);
   }
-  checkTokenExist(){
+
+  checkTokenExist() {
     return localStorage.getItem('userData');
 
   }

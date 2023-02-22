@@ -59,15 +59,44 @@
   <br/>
   <div [ngSwitch]="view">
     <ng-template let-isOpen="isOpen" #customOpenDayTemplate>
-      <div class="my-open-events" [@collapse] *ngIf="isOpen" style="padding: 10px">
-        <h4>Actions:</h4>
-        <span>Add attendance</span>
-        <button mat-button color="primary" (click)="open(attendanceModal)">
-          <mat-icon>access_time</mat-icon>
-        </button>
+      <div class="my-open-events" [@collapse]="" *ngIf="isOpen" style="padding: 10px">
+        <div fxFlexFill *ngIf="!isAttendanceError && !isAttendanceLoading">
+          <h4>Actions:</h4>
+          <span>Add attendance</span>
+          <button #addAttendance id="add-attendance" mat-button color="primary" (click)="onAddAttendance(attendanceModal)">
+            <mat-icon>access_time</mat-icon>
+          </button>
+          <mat-list>
+            <mat-list-item role="listitem" *ngFor="let attendance of todayAttendance">
+              <span>
+                <span style="color:cornflowerblue" *ngIf="attendance.activity">{{attendance.activity.name}}: </span>
+                <span> {{attendance.comment}} </span>
+                <span style="color:royalblue">{{formatTime(attendance.checkIn)}}
+                   - {{formatTime(attendance.checkOut)}}</span>
+              </span>
+              <ng-container >
+                <button mat-icon-button color="primary" (click)="onEditAttendance(attendance, editAttendanceModal)" matTooltip="edit attendance">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                |
+                <button mat-icon-button color="warn" (click)="onDeleteAttendance(attendance, deleteAttendanceModal)" matTooltip="delete attendance">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </ng-container>
+            </mat-list-item>
+          </mat-list>
+        </div>
+        <div fxFlexFill fxLayout="column" fxLayoutAlign="center center"
+             *ngIf="isAttendanceLoading && !isAttendanceError">
+          <mat-spinner style="align-content: center"></mat-spinner>
+        </div>
+
+        <div fxFlexFill fxLayout="column" fxLayoutAlign="center center" *ngIf="isAttendanceError">
+          <p style="font-size: 20px">Some error occurred!</p>
+        </div>
       </div>
     </ng-template>
-    <mwl-calendar-month-view
+    <mwl-calendar-month-view #calendar
       *ngSwitchCase="CalendarView.Month"
       [viewDate]="viewDate"
       [activeDayIsOpen]="activeDayIsOpen"
@@ -90,54 +119,180 @@
 </div>
 
 <ng-template #attendanceModal let-modal>
+  <div *ngIf="!isActivityLoading && !isActivityError">
+    <div class="modal-header">
+      <h4 class="modal-title" id="modal-basic-title">Add attendance</h4>
+      <button mat-icon-button color="warn" (click)="modal.dismiss('Cross click')">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+    <div class="modal-body" style="width: auto">
+      <form #attendanceForm="ngForm" (ngSubmit)="addAttendance(attendanceForm)" id="attendanceForm">
+
+        <mat-form-field fxFlexFill>
+          <mat-label>Activity</mat-label>
+          <mat-select (click)="notify()" name="activity" required [(ngModel)]="activity">
+            <mat-option *ngFor="let activity of userActivities" [value]="activity">{{activity.name}}</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field fxFlexFill>
+          <mat-label>Check in</mat-label>
+          <mat-label>Time</mat-label>
+          <input
+            (click)="notify()"
+            name="checkIn"
+            matInput
+            aria-label="default time"
+            [ngxTimepicker]="checkInTimeModal"
+            [format]="24"
+            [value]="'09:00'"
+            [(ngModel)]="checkIn"
+            required
+          />
+          <ngx-material-timepicker #checkInTimeModal>
+          </ngx-material-timepicker>
+        </mat-form-field>
+
+        <mat-form-field fxFlexFill>
+          <mat-label>Check out</mat-label>
+          <mat-label>Time</mat-label>
+          <input
+            (click)="notify()"
+            name="checkOut"
+            matInput
+            aria-label="default time"
+            [ngxTimepicker]="checkOutTimeModal"
+            [format]="24"
+            [value]="'17:00'"
+            [(ngModel)]="checkOut"
+            required
+          />
+          <ngx-material-timepicker #checkOutTimeModal>
+          </ngx-material-timepicker>
+        </mat-form-field>
+
+        <mat-form-field fxFlexFill>
+          <mat-label>Comment</mat-label>
+          <textarea (click)="notify()"  matInput [(ngModel)]="comment" name="comment" required></textarea>
+        </mat-form-field>
+
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button mat-raised-button
+              id="save-attendance"
+              color="primary"
+              [disabled]="attendanceForm.invalid"
+              (click)="modal.close('Save click')"
+              type="submit" form="attendanceForm">
+        Save
+      </button>
+    </div>
+  </div>
+  <div fxFlexFill fxLayoutAlign="center center" *ngIf="isActivityLoading && !isActivityError">
+    <mat-spinner style="align-content: center"></mat-spinner>
+  </div>
+  <div fxFlexFill fxLayoutAlign="center center" style="padding: 10px" *ngIf="isActivityError">
+    <p style="font-size: 30px">Some error occurred!</p>
+  </div>
+</ng-template>
+
+
+<ng-template #deleteAttendanceModal let-modal>
   <div class="modal-header">
-    <h4 class="modal-title" id="modal-basic-title">Attendance</h4>
-    <button mat-icon-button color="warn" (click)="modal.dismiss('Cross click')">
+    <h4 class="modal-title" id="delete-modal">Deleting {{selectedAttendance.comment}}?</h4>
+    <button mat-icon-button (click)="modal.close('None')" color="warn">
       <mat-icon>close</mat-icon>
     </button>
   </div>
   <div class="modal-body" style="width: auto">
-    <form #attendanceForm="ngForm" (ngSubmit)="addAttendance()" id="attendanceForm">
-      <mat-form-field fxFlexFill>
-        <mat-label>Check in</mat-label>
-        <mat-label>Time</mat-label>
-        <input
-          name="checkIn"
-          matInput
-          aria-label="default time"
-          [ngxTimepicker]="checkInTimeModal"
-          [format]="24"
-          [value]="'09:00'"
-          [(ngModel)]="checkIn"
-        />
-        <ngx-material-timepicker #checkInTimeModal>
-        </ngx-material-timepicker>
-      </mat-form-field>
-
-      <mat-form-field fxFlexFill>
-        <mat-label>Check out</mat-label>
-        <mat-label>Time</mat-label>
-        <input
-          name="checkOut"
-          matInput
-          aria-label="default time"
-          [ngxTimepicker]="checkOutTimeModal"
-          [format]="24"
-          [value]="'17:00'"
-          [(ngModel)]="checkOut"
-        />
-        <ngx-material-timepicker #checkOutTimeModal>
-        </ngx-material-timepicker>
-      </mat-form-field>
+    <form  id="deleteForm" (ngSubmit)="deleteAttendance(selectedAttendance.id)">
+      <p style="font-size: 20px; font-weight: bold">Are you sure?</p>
     </form>
   </div>
   <div class="modal-footer">
-    <button mat-raised-button
-            color="primary"
-            (click)="modal.close('Save click')"
-            type="submit" form="attendanceForm">
-      Save
-    </button>
+    <button mat-raised-button color="warn" type="submit" form="deleteForm" (click)="modal.close('Delete')">Yes</button>
+    |
+    <button mat-raised-button color="primary" (click)="modal.close()">No</button>
+  </div>
+</ng-template>
+
+
+<ng-template #editAttendanceModal let-modal>
+  <div *ngIf="!isActivityLoading && !isActivityError">
+    <div class="modal-header">
+      <h4 class="modal-title" id="editAttendance">Edit attendance</h4>
+      <button mat-icon-button color="warn" (click)="modal.dismiss()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+    <div class="modal-body" style="width: auto">
+      <form #editAttendanceForm="ngForm"  id="editAttendanceForm" (ngSubmit)="editAttendance(editAttendanceForm)">
+
+        <mat-form-field fxFlexFill>
+          <mat-label>Activity</mat-label>
+          <mat-select name="activity" required [ngModel]="selectedAttendance.activity">
+            <mat-option *ngFor="let activity of userActivities" [value]="activity" >{{activity.name}}</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field fxFlexFill>
+          <mat-label>Check in</mat-label>
+          <mat-label>Time</mat-label>
+          <input
+            name="checkIn"
+            matInput
+            aria-label="default time"
+            [ngxTimepicker]="checkInTimeModal"
+            [format]="24"
+            [value]="'09:00'"
+            [(ngModel)]="selectedAttendanceCheckIn"
+            required
+          />
+          <ngx-material-timepicker #checkInTimeModal>
+          </ngx-material-timepicker>
+        </mat-form-field>
+
+        <mat-form-field fxFlexFill>
+          <mat-label>Check out</mat-label>
+          <mat-label>Time</mat-label>
+          <input
+            name="checkOut"
+            matInput
+            aria-label="default time"
+            [ngxTimepicker]="checkOutTimeModal"
+            [format]="24"
+            [value]="'17:00'"
+            [(ngModel)]="selectedAttendanceCheckOut"
+            required
+          />
+          <ngx-material-timepicker #checkOutTimeModal>
+          </ngx-material-timepicker>
+        </mat-form-field>
+
+        <mat-form-field fxFlexFill>
+          <mat-label>Comment</mat-label>
+          <textarea matInput [ngModel]="selectedAttendance.comment" name="comment" required></textarea>
+        </mat-form-field>
+
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button mat-raised-button
+              color="primary"
+              [disabled]="editAttendanceForm.invalid"
+              (click)="modal.close('Save click')"
+              type="submit" form="editAttendanceForm">
+        Save
+      </button>
+    </div>
+  </div>
+  <div fxFlexFill fxLayoutAlign="center center" *ngIf="isActivityLoading && !isActivityError">
+    <mat-spinner style="align-content: center"></mat-spinner>
+  </div>
+  <div fxFlexFill fxLayoutAlign="center center" style="padding: 10px" *ngIf="isActivityError">
+    <p style="font-size: 30px">Some error occurred!</p>
   </div>
 </ng-template>
 

@@ -54,6 +54,11 @@
       <span fxFlex></span>
       <span>Welcome {{username}}</span>
       <span fxFlex></span>
+      <button mat-icon-button (click)="onToggleRecognition()">
+        <mat-icon>{{ isRecording ? 'mic' : 'mic_none' }}</mat-icon>
+      </button>
+      <mat-spinner *ngIf="isRecording" color="accent" diameter="20"></mat-spinner>
+      <span fxFlex="2"></span>
       <button mat-icon-button (click)="logOut()" matTooltip="logout">
         <mat-icon>
           logout

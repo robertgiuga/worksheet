@@ -104,7 +104,7 @@ export class ActivitiesComponent implements OnInit {
     const updateActivity = JSON.parse(JSON.stringify(this.selectedActivity));
     updateActivity.name = updateForm.value.name;
     updateActivity.description = updateForm.value.description;
-    updateActivity.users = newActivityUsers.map(value1 => <UserLogin>{id: value1.id});
+    updateActivity.users = newActivityUsers.map(value1 => <User>{id: value1.id});
     this.isLoading= true;
     this.activityService.updateActivity(updateActivity).subscribe(value => {
         this.snackBar.open("Activity updated successfully", "Ok",{duration: 2000});

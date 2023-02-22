@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import {ClassProvider, FactoryProvider, NgModule, PLATFORM_ID} from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -33,6 +33,8 @@ import {MatSnackBarModule} from "@angular/material/snack-bar";
 import {NgxMaterialTimepickerModule} from "ngx-material-timepicker";
 import {MatTooltipModule} from "@angular/material/tooltip";
 import {MatRadioModule} from "@angular/material/radio";
+import {MatDialogModule} from "@angular/material/dialog";
+
 
 @NgModule({
   declarations: [
@@ -70,7 +72,8 @@ import {MatRadioModule} from "@angular/material/radio";
     NgxMaterialTimepickerModule,
     MatTooltipModule,
     MatRadioModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    MatDialogModule
   ],
   providers: [],
   bootstrap: [AppComponent]
