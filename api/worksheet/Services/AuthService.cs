@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
@@ -32,7 +33,8 @@ namespace worksheet.Services
         public (string token, int expiresIn, User user)? LogIn(UserLogin userLogin)
         {
             var user = _worksheetContext.Users.Where(u => u.Email == userLogin.Email).SingleOrDefault();
-
+            if (user == null)
+                return null;
             if (user.Email!=userLogin.Email)
                 return null;
             if (!_passwordHasher.Check(user.Password, userLogin.Password).Verified)

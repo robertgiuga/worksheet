@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using worksheet.Context;
 
 namespace worksheet.Migrations
 {
     [DbContext(typeof(WorksheetContext))]
-    partial class WorksheetContextModelSnapshot : ModelSnapshot
+    [Migration("20221206160249_updated-attendance")]
+    partial class updatedattendance
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -71,7 +73,7 @@ namespace worksheet.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("UserId")
+                    b.Property<int?>("UserId")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
@@ -143,9 +145,7 @@ namespace worksheet.Migrations
 
                     b.HasOne("worksheet.Models.User", "User")
                         .WithMany("Attendances")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("UserId");
 
                     b.Navigation("Activity");
 

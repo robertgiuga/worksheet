@@ -6,72 +6,63 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using worksheet.Context;
 using worksheet.Dto;
 using worksheet.Models;
 using worksheet.Services.Interfaces;
-using worksheet.Utils;
 
 namespace worksheet.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     [Authorize]
-    public class UserController : ControllerBase
+    public class AttendanceController : ControllerBase
     {
+        private readonly IAttendanceService _attendanceService;
 
-        private readonly IUserService _userService;
-
-        public UserController(IUserService userService)
+        public AttendanceController(IAttendanceService attendanceService)
         {
-            _userService = userService;
-        }
-
-        [HttpGet]
-        [Authorize(Roles = "admin")]
-        public async Task<IActionResult> GetUsersAsync()
-        {
-            return Ok(await _userService.GetUsersAsync());
-        }
-
-        [HttpGet("activities")]
-        public async Task<IActionResult> GetCurrentUserActivitiesAsync()
-        {
-            var rez =await _userService.GetUserActivitiesAsync(GetCurrentUser().Id);
-            return Ok(rez);
-        }
-
-        [HttpGet("{id}/activities")]
-        [Authorize(Roles = "admin")]
-        public async Task<IActionResult> GetUserActivitiesAsync(int id)
-        {
-            return Ok(await _userService.GetUserActivitiesAsync(id));
-        }
-
-        [HttpPut("{id}")]
-        [Authorize(Roles = "admin")]
-        public async Task<IActionResult> UpdateUserAsync([FromBody] UserDto user)
-        {
-            var result = await _userService.UpdateUserAsync(user);
-            if (result == null)
-                return Problem();
-            return Ok(result);
+            _attendanceService = attendanceService;
         }
 
         [HttpPost]
-        [Authorize(Roles = "admin")]
-        public async Task<IActionResult> AddUserAsync([FromBody] UserDto user)
+        public async Task<IActionResult> AddCurrentUserAttendanceAsync([FromBody] AttendanceDto attendance)
         {
-            var result = await _userService.AddUserAsync(user);
+            attendance.User = new UserDto(GetCurrentUser());
+            var result = await _attendanceService.AddAttendanceAsync(attendance);
             if (result == null)
                 return Problem();
             return Ok(result);
         }
-      
+
+        [HttpGet("{date}")]
+        public async Task<IActionResult> GetCurrentUserAttendanceAsync(DateTime date)
+        {
+            return Ok(await _attendanceService.GetUserAttendanceAsync(GetCurrentUser(), date));
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteAttendanceAsync(int id)
+        {
+            var result = await _attendanceService.DeleteAttendanceAsync(id,GetCurrentUser());
+            if (!result)
+                return Problem();
+            return Ok();
+        }
+
+        [HttpPut()]
+        public async Task<IActionResult> UpdateAttendanceAsync([FromBody] AttendanceDto attendance)
+        {
+            var result = await _attendanceService.UpdateAttendanceAsync(attendance, GetCurrentUser());
+            if (result == null)
+                return Problem();
+            return Ok(result);
+        }
+
         private User GetCurrentUser()
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            if (identity != null) {
+            if (identity != null)
+            {
                 var claims = identity.Claims;
                 return new User
                 {
@@ -84,7 +75,5 @@ namespace worksheet.Controllers
             }
             return null;
         }
-        
-
     }
 }

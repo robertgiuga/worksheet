@@ -36,10 +36,11 @@ namespace worksheet
             services.AddCors(config =>
                 config.AddDefaultPolicy(options => options.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));
 
-            services.AddSingleton<IPasswordHasher, PasswordHasher>();
+            services.AddScoped<IPasswordHasher, PasswordHasher>();
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IActivityService, ActivityService>();
+            services.AddScoped<IAttendanceService, AttendanceService>();
 
             services.AddAuthentication(options=> {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

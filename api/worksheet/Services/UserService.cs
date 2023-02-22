@@ -7,16 +7,19 @@ using worksheet.Context;
 using worksheet.Dto;
 using worksheet.Models;
 using worksheet.Services.Interfaces;
+using worksheet.Utils;
 
 namespace worksheet.Services
 {
     public class UserService : IUserService
     {
         private readonly WorksheetContext _worksheetContext;
+        private readonly IPasswordHasher _passwordHasher;
 
-        public UserService(WorksheetContext worksheetContext)
+        public UserService(WorksheetContext worksheetContext, IPasswordHasher passwordHasher)
         {
             _worksheetContext = worksheetContext;
+            _passwordHasher = passwordHasher;
         }
 
         public async Task<UserDto> AddUserAsync(UserDto user)
@@ -38,7 +41,7 @@ namespace worksheet.Services
                 Role = role,
                 Activities = activities,
                 Surname = user.Surname,
-                Password = "12345"
+                Password = _passwordHasher.Hash("12345")
             };
             _worksheetContext.Users.Add(modelUser);
             await _worksheetContext.SaveChangesAsync();
