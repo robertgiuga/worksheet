@@ -93,4 +93,11 @@ export class UserService {
       {headers: new HttpHeaders({'Authorization': 'Bearer ' + this.user.token})}
     );
   }
+
+  getHours(){
+    return this.http.get<{ }>(
+      'http://localhost:5000/api/attendance/hours',
+      {headers: new HttpHeaders({'Authorization': 'Bearer ' + this.user.token})}
+    );
+  }
 }
