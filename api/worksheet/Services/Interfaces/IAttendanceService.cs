@@ -13,5 +13,7 @@ namespace worksheet.Services.Interfaces
         Task<IEnumerable<AttendanceDto>> GetUserAttendanceAsync(User user, DateTime date);
         Task<bool> DeleteAttendanceAsync(int id, User user);
         Task<AttendanceDto> UpdateAttendanceAsync(AttendanceDto attendance, User user);
+
+        Task<(int WorkedHours, int TotalHours, int ExtraHours)?> GetUserHours(User user);
     }
 }

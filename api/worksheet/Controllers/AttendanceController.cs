@@ -58,6 +58,15 @@ namespace worksheet.Controllers
             return Ok(result);
         }
 
+        [HttpGet("hours")]
+        public async Task<IActionResult> GetCurrentUserHours()
+        {
+            var result = await _attendanceService.GetUserHours(GetCurrentUser());
+            if (result == null)
+                return Problem();
+            return Ok(new { TotalHours= result.Value.TotalHours, WorkedHours= result.Value.WorkedHours, ExtraHours= result.Value.ExtraHours });
+        }
+
         private User GetCurrentUser()
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
