@@ -22,6 +22,7 @@ namespace worksheet.Services
             _passwordHasher = passwordHasher;
         }
 
+
         public async Task<UserDto> AddUserAsync(UserDto user)
         {
             List<Activity> activities = new();
@@ -56,6 +57,7 @@ namespace worksheet.Services
                  .FirstOrDefaultAsync();
             return result.Activities.Select(a => new ActivityDto { Id = a.Id, Name = a.Name, Description = a.Description }).ToList();
         }
+
 
         public async Task<IEnumerable<UserDto>> GetUsersAsync()
         {

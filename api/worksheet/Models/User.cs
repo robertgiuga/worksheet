@@ -21,9 +21,14 @@ namespace worksheet.Models
         [Required]
         [MaxLength(50)]
         public string GivenName { get; set; }
+        
+        public int HolidayDays { get; set; }
+
+        public int UsedHolidayDays { get; set; }
         public UserRoles Role { get; set; }
         public List<Activity> Activities { get; set; } = new List<Activity>();
         public List<Attendance> Attendances { get; set; } = new List<Attendance>();
+        public List<HolidayRecord> HolidayRecords { get; set; } = new List<HolidayRecord>();
 
         public override bool Equals(object obj)
         {
@@ -37,4 +42,6 @@ namespace worksheet.Models
         admin,
         user
     }
+
+
 }

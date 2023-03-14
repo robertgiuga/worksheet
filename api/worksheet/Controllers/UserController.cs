@@ -37,7 +37,7 @@ namespace worksheet.Controllers
         [HttpGet("activities")]
         public async Task<IActionResult> GetCurrentUserActivitiesAsync()
         {
-            var rez =await _userService.GetUserActivitiesAsync(GetCurrentUser().Id);
+            var rez = await _userService.GetUserActivitiesAsync(GetCurrentUser().Id);
             return Ok(rez);
         }
 
@@ -68,6 +68,7 @@ namespace worksheet.Controllers
             return Ok(result);
         }
       
+
         private User GetCurrentUser()
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;

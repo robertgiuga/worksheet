@@ -21,10 +21,14 @@ namespace worksheet.Context
         {
 
             modelBuilder.Entity<User>().HasIndex(u => u.Email).IsUnique();
+            modelBuilder.Entity<User>().Property(u => u.HolidayDays).HasDefaultValue(21);
+            modelBuilder.Entity<HolidayRecord>().Property(u => u.Status).HasDefaultValue(HolidayRecordType.pending);
         }
 
         public DbSet<User> Users { get; set; }
         public DbSet<Activity> Activities { get; set; }
         public DbSet<Attendance> Attendances { get; set; }
+
+        public DbSet<HolidayRecord> HolidayRecords { get; set; }
     }
 }

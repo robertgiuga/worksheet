@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using worksheet.Context;
 
 namespace worksheet.Migrations
 {
     [DbContext(typeof(WorksheetContext))]
-    partial class WorksheetContextModelSnapshot : ModelSnapshot
+    [Migration("20230309085940_HolidayDays")]
+    partial class HolidayDays
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -81,33 +83,6 @@ namespace worksheet.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Attendances");
-                });
-
-            modelBuilder.Entity("worksheet.Models.HolidayRecord", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateTime>("EndDate")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("StartDate")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("Status")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER")
-                        .HasDefaultValue(0);
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("HolidayRecords");
                 });
 
             modelBuilder.Entity("worksheet.Models.User", b =>
@@ -187,22 +162,9 @@ namespace worksheet.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("worksheet.Models.HolidayRecord", b =>
-                {
-                    b.HasOne("worksheet.Models.User", "User")
-                        .WithMany("HolidayRecords")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("worksheet.Models.User", b =>
                 {
                     b.Navigation("Attendances");
-
-                    b.Navigation("HolidayRecords");
                 });
 #pragma warning restore 612, 618
         }

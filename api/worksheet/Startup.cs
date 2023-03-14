@@ -41,6 +41,7 @@ namespace worksheet
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IActivityService, ActivityService>();
             services.AddScoped<IAttendanceService, AttendanceService>();
+            services.AddScoped<IHolidayService, HolidayService>();
 
             services.AddAuthentication(options=> {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
