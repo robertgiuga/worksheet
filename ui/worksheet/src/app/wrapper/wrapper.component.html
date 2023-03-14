@@ -35,14 +35,14 @@
           <span>Manage Employees</span>
         </mat-list-item>
       </a>
-<!--      <a *ngIf="user.role=='admin'" routerLink="/reports">-->
-<!--        <mat-list-item  routerLinkActive="selected">-->
-<!--          <button disabled mat-button color="primary">-->
-<!--            <mat-icon color="primary">library_books</mat-icon>-->
-<!--          </button>-->
-<!--          <span>Reports</span>-->
-<!--        </mat-list-item>-->
-<!--      </a>-->
+      <a *ngIf="user.role=='admin'" routerLink="/holiday-requests">
+        <mat-list-item  routerLinkActive="selected">
+          <button disabled mat-button color="primary">
+            <mat-icon color="primary" matBadge="3">beach_access</mat-icon>
+          </button>
+          <span>Holiday Requests</span>
+        </mat-list-item>
+      </a>
     </mat-nav-list>
   </mat-sidenav>
   <mat-sidenav-content>

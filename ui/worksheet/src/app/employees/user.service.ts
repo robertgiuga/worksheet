@@ -100,4 +100,5 @@ export class UserService {
       {headers: new HttpHeaders({'Authorization': 'Bearer ' + this.user.token})}
     );
   }
+
 }

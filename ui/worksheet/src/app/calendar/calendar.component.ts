@@ -1,5 +1,5 @@
 import {ChangeDetectorRef, Component, NgZone, OnInit, ViewChild, ViewChildren,} from '@angular/core';
-import {CalendarView, collapseAnimation} from "angular-calendar";
+import {CalendarMonthViewBeforeRenderEvent, CalendarView, collapseAnimation} from "angular-calendar";
 import {isSameDay, isSameMonth} from "date-fns";
 import {NgbModal, NgbModalRef} from "@ng-bootstrap/ng-bootstrap";
 import {Activity} from "../../model/Activity";
@@ -12,6 +12,8 @@ import {SpeechRecognitionService} from "../speech/speech-recognition.service";
 import {Router} from "@angular/router";
 import {AddAttendanceStrategy} from "../speech/actions/add-attendance-strategy";
 import {ActionContext} from "../speech/action-context";
+import {Holiday} from "../../model/Holiday";
+import {HolidayService} from "../holiday-requests/holiday.service";
 
 @Component({
   selector: 'app-calendar',
@@ -40,7 +42,9 @@ export class CalendarComponent implements OnInit {
   comment: string = "";
   activity: Activity;
   transcriptSubject$;
-  subsription;
+  subscription;
+  minDate: Date;
+  holidayRequests: Holiday[];
   @ViewChild("calendar") calendar;
 
 
@@ -53,20 +57,54 @@ export class CalendarComponent implements OnInit {
               private snackBar: MatSnackBar,
               private addAttendanceStrategy: AddAttendanceStrategy,
               private actionContext: ActionContext,
+              private holidayService: HolidayService,
               private speechSynthesizer: SpeechSynthesizerService) {
+    this.minDate = new Date();
   }
 
   ngOnInit(): void {
     this.transcriptSubject$= this.addAttendanceStrategy.transcriptSubject;
+    this.holidayService.getUserHolidayRequests().subscribe((value)=>{
+      this.holidayRequests= value;
+    })
   }
   ngOnDestroy() :void{
-    this.subsription.unsubscribe();
+
+    this.subscription.unsubscribe();
     this.modalService.dismissAll();
   }
 
   ngAfterViewInit(): void {
     console.log("reload");
-   this.subsription=this.transcriptSubject$.subscribe(this.attendanceAssistant.bind(this));
+   this.subscription=this.transcriptSubject$.subscribe(this.attendanceAssistant.bind(this));
+  }
+
+  beforeMonthViewRender(renderEvent: CalendarMonthViewBeforeRenderEvent): void {
+    console.log("****")
+    renderEvent.body.forEach((day) => {
+      const dayOfMonth = day.date.getDate();
+
+      if (this.dateInRequestHoliday(day.date)) {
+        day.backgroundColor="cornflowerblue";
+      }
+    });
+  }
+
+  private dateInRequestHoliday(date:Date):boolean{
+    let val:boolean= false;
+    this.holidayRequests.forEach(h=>{
+      // @ts-ignore
+      let start= new Date(h.startDate?.split("T")[0]);
+      start.setHours(0,0,0);
+      // @ts-ignore
+      let stop= new Date(h.endDate?.split("T")[0]);
+      stop.setHours(0,0,0);
+      //TODO improve
+       if(start<=date&&date<=stop) {
+         val = true;
+       }
+    })
+    return val;
   }
 
   notify() {
@@ -157,7 +195,7 @@ export class CalendarComponent implements OnInit {
             this.questionNr = 0;
             // @ts-ignore
             document.getElementById('save-attendance').click();
-            this.subsription.unsubscribe();
+            this.subscription.unsubscribe();
           } else
             this.questionNr--;
           break;
@@ -361,5 +399,25 @@ export class CalendarComponent implements OnInit {
       }
     }
 
+  }
+
+  onRequestHoliday(content){
+    this.modalService.open(content, {centered: true, size: 'sm'}).result.then().catch(() => {
+
+    });
+  }
+
+  requestHoliday(requestForm:NgForm){
+    console.log(requestForm.value)
+    let holiday:Holiday={
+      startDate: this.formatDate( requestForm.value.startDate),
+      endDate: this.formatDate(requestForm.value.endDate)
+    }
+    this.holidayService.addHolidayRequest(holiday).subscribe(value => {
+      console.log(value);
+      this.snackBar.open("Request made successfully", "Ok", {duration: 2000})
+    }, error => {
+      this.snackBar.open("Cannot request holiday in this interval!", "Ok", {duration: 2000})
+    });
   }
 }

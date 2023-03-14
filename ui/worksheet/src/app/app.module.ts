@@ -34,6 +34,10 @@ import {NgxMaterialTimepickerModule} from "ngx-material-timepicker";
 import {MatTooltipModule} from "@angular/material/tooltip";
 import {MatRadioModule} from "@angular/material/radio";
 import {MatDialogModule} from "@angular/material/dialog";
+import {MatDatepickerModule} from "@angular/material/datepicker";
+import {MatNativeDateModule} from "@angular/material/core";
+import {MatBadgeModule} from "@angular/material/badge";
+import { HolidayRequestsComponent } from './holiday-requests/holiday-requests.component';
 
 
 @NgModule({
@@ -46,35 +50,39 @@ import {MatDialogModule} from "@angular/material/dialog";
     EmployeesComponent,
     DashboardComponent,
     ReportsComponent,
+    HolidayRequestsComponent,
   ],
-  imports: [
-    BrowserModule,
-    AppRoutingModule,
-    BrowserAnimationsModule,
-    MatFormFieldModule,
-    MatInputModule,
-    FlexModule,
-    MatCardModule,
-    MatToolbarModule,
-    MatButtonModule,
-    CalendarModule.forRoot({provide: DateAdapter, useFactory: adapterFactory}),
-    NgbModule,
-    MatMenuModule,
-    MatIconModule,
-    MatSidenavModule,
-    MatListModule,
-    FormsModule,
-    HttpClientModule,
-    MatProgressSpinnerModule,
-    MatTableModule,
-    MatSelectModule,
-    MatSnackBarModule,
-    NgxMaterialTimepickerModule,
-    MatTooltipModule,
-    MatRadioModule,
-    ReactiveFormsModule,
-    MatDialogModule
-  ],
+    imports: [
+        BrowserModule,
+        AppRoutingModule,
+        BrowserAnimationsModule,
+        MatFormFieldModule,
+        MatInputModule,
+        FlexModule,
+        MatCardModule,
+        MatToolbarModule,
+        MatButtonModule,
+        CalendarModule.forRoot({provide: DateAdapter, useFactory: adapterFactory}),
+        NgbModule,
+        MatMenuModule,
+        MatIconModule,
+        MatSidenavModule,
+        MatListModule,
+        FormsModule,
+        HttpClientModule,
+        MatProgressSpinnerModule,
+        MatTableModule,
+        MatSelectModule,
+        MatSnackBarModule,
+        NgxMaterialTimepickerModule,
+        MatTooltipModule,
+        MatRadioModule,
+        ReactiveFormsModule,
+        MatDialogModule,
+        MatDatepickerModule,
+        MatNativeDateModule,
+        MatBadgeModule
+    ],
   providers: [],
   bootstrap: [AppComponent]
 })

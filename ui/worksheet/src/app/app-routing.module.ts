@@ -7,6 +7,7 @@ import {EmployeesComponent} from "./employees/employees.component";
 import {ActivitiesComponent} from "./activities/activities.component";
 import {AuthGuard} from "./auth/auth.guard";
 import {DashboardComponent} from "./dashboard/dashboard.component";
+import {HolidayRequestsComponent} from "./holiday-requests/holiday-requests.component";
 
 const routes: Routes = [
   { path: '', redirectTo: '/calendar', pathMatch: 'full' },
@@ -21,6 +22,7 @@ const routes: Routes = [
       // { path: 'reports', component: ReportsComponent },
       { path: 'employees', component: EmployeesComponent },
       { path: 'activities', component: ActivitiesComponent },
+      { path:'holiday-requests', component: HolidayRequestsComponent}
     ]
   },
 ];

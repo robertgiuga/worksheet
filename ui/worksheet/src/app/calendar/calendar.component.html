@@ -1,4 +1,9 @@
 <div class="row text-center" style="padding: 10px">
+  <div class="col-md-1" style="padding-bottom: 5px">
+    <button mat-icon-button matTooltip="request holiday!!" color="accent" aria-label="Holiday request" (click)="onRequestHoliday(requestHolidayModal)">
+      <mat-icon>beach_access</mat-icon>
+    </button>
+  </div>
   <div class="col-md-4">
     <div class="btn-group">
       <div
@@ -28,7 +33,7 @@
       </div>
     </div>
   </div>
-  <div class="col-md-4">
+  <div class="col-md-3">
     <h2>{{ viewDate | calendarDate:(view + 'ViewTitle'):'en' }}</h2>
   </div>
   <div class="col-md-4">
@@ -57,13 +62,23 @@
     </div>
   </div>
   <br/>
+  <br/>
   <div [ngSwitch]="view">
+    <ng-template #customCellTemplate let-day="day" let-locale="locale">
+      <div class="cal-cell-top">
+    <span class="cal-day-badge" *ngIf="day.badgeTotal > 0">{{ day.badgeTotal }}</span>
+        <span class="cal-day-number">{{ day.date | calendarDate:'monthViewDayNumber':locale }}</span>
+      </div>
+      <small ></small>
+    </ng-template>
+
     <ng-template let-isOpen="isOpen" #customOpenDayTemplate>
       <div class="my-open-events" [@collapse]="" *ngIf="isOpen" style="padding: 10px">
         <div fxFlexFill *ngIf="!isAttendanceError && !isAttendanceLoading">
           <h4>Actions:</h4>
           <span>Add attendance</span>
-          <button #addAttendance id="add-attendance" mat-button color="primary" (click)="onAddAttendance(attendanceModal)">
+          <button #addAttendance id="add-attendance" mat-button color="primary"
+                  (click)="onAddAttendance(attendanceModal)">
             <mat-icon>access_time</mat-icon>
           </button>
           <mat-list>
@@ -72,14 +87,16 @@
                 <span style="color:cornflowerblue" *ngIf="attendance.activity">{{attendance.activity.name}}: </span>
                 <span> {{attendance.comment}} </span>
                 <span style="color:royalblue">{{formatTime(attendance.checkIn)}}
-                   - {{formatTime(attendance.checkOut)}}</span>
+                  - {{formatTime(attendance.checkOut)}}</span>
               </span>
-              <ng-container >
-                <button mat-icon-button color="primary" (click)="onEditAttendance(attendance, editAttendanceModal)" matTooltip="edit attendance">
+              <ng-container>
+                <button mat-icon-button color="primary" (click)="onEditAttendance(attendance, editAttendanceModal)"
+                        matTooltip="edit attendance">
                   <mat-icon>edit</mat-icon>
                 </button>
                 |
-                <button mat-icon-button color="warn" (click)="onDeleteAttendance(attendance, deleteAttendanceModal)" matTooltip="delete attendance">
+                <button mat-icon-button color="warn" (click)="onDeleteAttendance(attendance, deleteAttendanceModal)"
+                        matTooltip="delete attendance">
                   <mat-icon>delete</mat-icon>
                 </button>
               </ng-container>
@@ -97,12 +114,14 @@
       </div>
     </ng-template>
     <mwl-calendar-month-view #calendar
-      *ngSwitchCase="CalendarView.Month"
-      [viewDate]="viewDate"
-      [activeDayIsOpen]="activeDayIsOpen"
-      (dayClicked)="dayClicked($event.day)"
-      [openDayEventsTemplate]="customOpenDayTemplate"
-      [weekStartsOn]="1"
+                             *ngSwitchCase="CalendarView.Month"
+                             [viewDate]="viewDate"
+                             [activeDayIsOpen]="activeDayIsOpen"
+                             (dayClicked)="dayClicked($event.day)"
+                             [openDayEventsTemplate]="customOpenDayTemplate"
+                             [weekStartsOn]="1"
+                             [cellTemplate]="customCellTemplate"
+                             (beforeViewRender)="beforeMonthViewRender($event)"
     >
     </mwl-calendar-month-view>
     <mwl-calendar-week-view
@@ -174,7 +193,7 @@
 
         <mat-form-field fxFlexFill>
           <mat-label>Comment</mat-label>
-          <textarea (click)="notify()"  matInput [(ngModel)]="comment" name="comment" required></textarea>
+          <textarea (click)="notify()" matInput [(ngModel)]="comment" name="comment" required></textarea>
         </mat-form-field>
 
       </form>
@@ -207,7 +226,7 @@
     </button>
   </div>
   <div class="modal-body" style="width: auto">
-    <form  id="deleteForm" (ngSubmit)="deleteAttendance(selectedAttendance.id)">
+    <form id="deleteForm" (ngSubmit)="deleteAttendance(selectedAttendance.id)">
       <p style="font-size: 20px; font-weight: bold">Are you sure?</p>
     </form>
   </div>
@@ -228,12 +247,12 @@
       </button>
     </div>
     <div class="modal-body" style="width: auto">
-      <form #editAttendanceForm="ngForm"  id="editAttendanceForm" (ngSubmit)="editAttendance(editAttendanceForm)">
+      <form #editAttendanceForm="ngForm" id="editAttendanceForm" (ngSubmit)="editAttendance(editAttendanceForm)">
 
         <mat-form-field fxFlexFill>
           <mat-label>Activity</mat-label>
           <mat-select name="activity" required [ngModel]="selectedAttendance.activity">
-            <mat-option *ngFor="let activity of userActivities" [value]="activity" >{{activity.name}}</mat-option>
+            <mat-option *ngFor="let activity of userActivities" [value]="activity">{{activity.name}}</mat-option>
           </mat-select>
         </mat-form-field>
 
@@ -293,6 +312,39 @@
   </div>
   <div fxFlexFill fxLayoutAlign="center center" style="padding: 10px" *ngIf="isActivityError">
     <p style="font-size: 30px">Some error occurred!</p>
+  </div>
+</ng-template>
+
+<ng-template #requestHolidayModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="requestHoliday">Request holiday</h4>
+    <button mat-icon-button color="warn" (click)="modal.dismiss()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+  <div class="modal-body" style="width: auto">
+    <form #requestHolidayForm="ngForm" id="requestHolidayForm" (ngSubmit)="requestHoliday(requestHolidayForm)">
+
+      <mat-form-field appearance="fill">
+        <mat-label>Enter a date range</mat-label>
+        <mat-date-range-input [rangePicker]="picker" [min]="minDate">
+          <input matStartDate ngModel placeholder="Start date" name="startDate" required>
+          <input matEndDate ngModel placeholder="End date" name="endDate" required>
+        </mat-date-range-input>
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-date-range-picker #picker></mat-date-range-picker>
+      </mat-form-field>
+
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button mat-raised-button
+            color="primary"
+            [disabled]="requestHolidayForm.invalid"
+            (click)="modal.close('request')"
+            type="submit" form="requestHolidayForm">
+      Request
+    </button>
   </div>
 </ng-template>
 
