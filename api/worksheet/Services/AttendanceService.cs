@@ -66,7 +66,7 @@ namespace worksheet.Services
             }).ToListAsync();
         }
 
-        public async Task<(int WorkedHours, int TotalHours, int ExtraHours)?> GetUserHours(User user)
+        public async Task<(int WorkedHours, int TotalHours, int ExtraHours)?> GetUserHoursAsync(User user)
         {
             var currentDate = DateTime.Now;
             var buissnesDays = Enumerable.Range(1, DateTime.DaysInMonth(currentDate.Year, currentDate.Month))

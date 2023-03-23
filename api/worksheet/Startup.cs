@@ -29,6 +29,7 @@ namespace worksheet
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            //put db in root directory
             services.AddDbContext<WorksheetContext>(options =>
             {
                 options.UseSqlite(Configuration.GetConnectionString("Default"));

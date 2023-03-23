@@ -16,11 +16,14 @@ namespace worksheet.Dto
             User = new UserDto(holiday.User);
             StartDate = holiday.StartDate;
             EndDate = holiday.EndDate;
+            Status = holiday.Status.ToString();
         }
         public int Id { get; set; }
 
         public UserDto User { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
+
+        public String Status { get; set; }
     }
 }

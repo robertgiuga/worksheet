@@ -61,6 +61,26 @@ namespace worksheet.Controllers
             return Ok(result);
         }
 
+        [HttpPatch("accept")]
+        [Authorize(Roles = "admin")]
+        public async Task<IActionResult> AcceptHolidayRequest([FromBody] int holidayRequestId)
+        {
+            var result = await _holidayService.AcceptHolidayRequestAsync(holidayRequestId);
+            if (result == false)
+                return Problem();
+            return Ok();
+        }
+
+        [HttpPatch("decline")]
+        [Authorize(Roles = "admin")]
+        public async Task<IActionResult> DeclineHolidayRequest([FromBody] int holidayRequestId)
+        {
+            var result = await _holidayService.DeclineHolidayRequestAsync(holidayRequestId);
+            if (result == false)
+                return Problem();
+            return Ok();
+        }
+
         private User GetCurrentUser()
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;

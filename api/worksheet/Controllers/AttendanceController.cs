@@ -59,9 +59,9 @@ namespace worksheet.Controllers
         }
 
         [HttpGet("hours")]
-        public async Task<IActionResult> GetCurrentUserHours()
+        public async Task<IActionResult> GetCurrentUserHoursAsync()
         {
-            var result = await _attendanceService.GetUserHours(GetCurrentUser());
+            var result = await _attendanceService.GetUserHoursAsync(GetCurrentUser());
             if (result == null)
                 return Problem();
             return Ok(new { TotalHours= result.Value.TotalHours, WorkedHours= result.Value.WorkedHours, ExtraHours= result.Value.ExtraHours });
