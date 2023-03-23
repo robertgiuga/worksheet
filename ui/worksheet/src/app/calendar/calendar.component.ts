@@ -1,14 +1,13 @@
-import {ChangeDetectorRef, Component, NgZone, OnInit, ViewChild, ViewChildren,} from '@angular/core';
+import {ChangeDetectorRef, Component, NgZone, OnInit, ViewChild,} from '@angular/core';
 import {CalendarMonthViewBeforeRenderEvent, CalendarView, collapseAnimation} from "angular-calendar";
 import {isSameDay, isSameMonth} from "date-fns";
-import {NgbModal, NgbModalRef} from "@ng-bootstrap/ng-bootstrap";
+import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {Activity} from "../../model/Activity";
 import {UserService} from "../employees/user.service";
-import {FormBuilder, FormGroup, NgForm} from "@angular/forms";
+import {FormBuilder, NgForm} from "@angular/forms";
 import {Attendance} from "../../model/Attendance";
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {SpeechSynthesizerService} from "../speech/speech-synthesizer.service";
-import {SpeechRecognitionService} from "../speech/speech-recognition.service";
 import {Router} from "@angular/router";
 import {AddAttendanceStrategy} from "../speech/actions/add-attendance-strategy";
 import {ActionContext} from "../speech/action-context";
@@ -45,6 +44,10 @@ export class CalendarComponent implements OnInit {
   subscription;
   minDate: Date;
   holidayRequests: Holiday[];
+  holidayDays: Holiday[];
+  isTodayHoliday:boolean= false;
+  isTodayHolidayRequest:boolean= false;
+  todayHoliday:Holiday;
   @ViewChild("calendar") calendar;
 
 
@@ -64,9 +67,6 @@ export class CalendarComponent implements OnInit {
 
   ngOnInit(): void {
     this.transcriptSubject$= this.addAttendanceStrategy.transcriptSubject;
-    this.holidayService.getUserHolidayRequests().subscribe((value)=>{
-      this.holidayRequests= value;
-    })
   }
   ngOnDestroy() :void{
 
@@ -75,24 +75,30 @@ export class CalendarComponent implements OnInit {
   }
 
   ngAfterViewInit(): void {
-    console.log("reload");
    this.subscription=this.transcriptSubject$.subscribe(this.attendanceAssistant.bind(this));
   }
 
   beforeMonthViewRender(renderEvent: CalendarMonthViewBeforeRenderEvent): void {
-    console.log("****")
-    renderEvent.body.forEach((day) => {
-      const dayOfMonth = day.date.getDate();
+     this.holidayService.getUserHolidayRequests().subscribe((value)=>{
+       this.holidayRequests= value.filter(value1 => value1.status==='pending');
+       this.holidayDays= value.filter(value1 => value1.status==='accepted');
+       renderEvent.body.forEach((day) => {
 
-      if (this.dateInRequestHoliday(day.date)) {
-        day.backgroundColor="cornflowerblue";
-      }
-    });
+         if (this.dateInHoliday(day.date, this.holidayRequests)[0]) {
+           day.backgroundColor="#ff4081";
+         }
+         if (this.dateInHoliday(day.date, this.holidayDays)[0]) {
+           day.backgroundColor="cornflowerblue";
+         }
+       });
+     })
   }
 
-  private dateInRequestHoliday(date:Date):boolean{
+
+  private dateInHoliday(date:Date, holidays:Holiday[]):[boolean,Holiday]{
     let val:boolean= false;
-    this.holidayRequests.forEach(h=>{
+    let holiday:Holiday= {};
+    holidays.forEach(h=>{
       // @ts-ignore
       let start= new Date(h.startDate?.split("T")[0]);
       start.setHours(0,0,0);
@@ -102,10 +108,13 @@ export class CalendarComponent implements OnInit {
       //TODO improve
        if(start<=date&&date<=stop) {
          val = true;
+         holiday= h;
        }
     })
-    return val;
+    return [val,holiday];
   }
+
+  private
 
   notify() {
     console.log("*")
@@ -210,6 +219,10 @@ export class CalendarComponent implements OnInit {
       this.viewDate = date;
       this.isAttendanceLoading = true;
       this.isAttendanceError = false;
+      this.isTodayHoliday= this.dateInHoliday(date, this.holidayDays)[0];
+      const val=this.dateInHoliday(date, this.holidayRequests);
+      this.isTodayHolidayRequest=val[0];
+      this.todayHoliday= val[1];
       this.userService.getCurrentUserAttendance(this.formatDate(this.viewDate)).subscribe(
         value => {
           this.isAttendanceLoading = false;
@@ -268,7 +281,7 @@ export class CalendarComponent implements OnInit {
       this.todayAttendance = [...this.todayAttendance, value];
       this.isAttendanceLoading = false;
       this.snackBar.open("Attendance added successfully", "Ok", {duration: 2000});
-    }, error => {
+    }, () => {
       this.snackBar.open("Some error occurred! Could not add attendance", "Ok", {duration: 2000})
       this.isAttendanceLoading = false;
     });
@@ -354,7 +367,7 @@ export class CalendarComponent implements OnInit {
         this.selectedAttendance.comment = value.comment;
         this.isAttendanceLoading = false;
         this.snackBar.open("Attendance updated successfully", "Ok", {duration: 2000});
-      }, error => {
+      }, () => {
         this.isAttendanceLoading = false;
         this.snackBar.open("Some error occurred! Could not update attendance!", "Ok", {duration: 2000})
       })
@@ -416,8 +429,22 @@ export class CalendarComponent implements OnInit {
     this.holidayService.addHolidayRequest(holiday).subscribe(value => {
       console.log(value);
       this.snackBar.open("Request made successfully", "Ok", {duration: 2000})
-    }, error => {
+      window.location.reload();
+    }, () => {
       this.snackBar.open("Cannot request holiday in this interval!", "Ok", {duration: 2000})
     });
+  }
+
+  deleteHolidayRequest(holiday: Holiday) {
+    if(holiday.id) {
+      this.holidayService.deleteHolidayRequest(holiday.id).subscribe(() => {
+        window.location.reload();
+      }, () => {
+        this.snackBar.open("Some error occurred!", "Ok", {duration: 2000})
+      });
+    }
+    else{
+      this.snackBar.open("There is an error, please refresh page!", "Ok", {duration: 2000});
+    }
   }
 }

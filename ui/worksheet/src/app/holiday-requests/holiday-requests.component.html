@@ -1,4 +1,4 @@
-<div *ngIf="!isLoading && !isError" class="myTable">
+<div *ngIf="!isLoading && !isError && datasource.length!=0" class="myTable">
   <table fxFill mat-table [dataSource]="datasource">
 
     <!-- Position Column -->
@@ -43,4 +43,16 @@
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
     <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
   </table>
+</div>
+
+<div fxFlexFill fxLayout="column" fxLayoutAlign="center center" *ngIf="isLoading && !isError">
+  <mat-spinner style="align-content: center"></mat-spinner>
+</div>
+
+<div fxFlexFill fxLayout="column" fxLayoutAlign="center center" *ngIf="isError">
+  <p style="font-size: 30px">Some error occurred!</p>
+</div>
+
+<div  fxFlexFill fxLayout="column" fxLayoutAlign="center center" *ngIf="datasource.length==0">
+  <p style="font-size: 20px">There are no holiday requests:)</p>
 </div>

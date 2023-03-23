@@ -1,15 +1,14 @@
 import {Injectable, NgZone} from "@angular/core";
 import {ActionStrategy} from "./action-strategy";
-import {bottom, end} from "@popperjs/core";
 import {SpeechSynthesizerService} from "./speech-synthesizer.service";
 import {AddAttendanceStrategy} from "./actions/add-attendance-strategy";
-import {BehaviorSubject} from "rxjs";
 import {Router} from "@angular/router";
 import {LogoutStrategy} from "./actions/logout-strategy";
 import {HomeStrategy} from "./actions/home-strategy";
 import {ManageActivitiesStrategy} from "./actions/manage-activities-strategy";
 import {ManageEmployeesStrategy} from "./actions/manage-employees-strategy";
 import {DashboardStrategy} from "./actions/dashboard-strategy";
+import {HolidayStrategy} from "./actions/holiday-strategy";
 
 @Injectable({
   providedIn: 'root',
@@ -29,9 +28,10 @@ export class ActionContext {
     private homeStrategy: HomeStrategy,
     private manageActivitiesStrategy: ManageActivitiesStrategy,
     private manageEmployeesStrategy: ManageEmployeesStrategy,
-    private dashBoardStrategy: DashboardStrategy
+    private dashBoardStrategy: DashboardStrategy,
+    private holidayStrategy: HolidayStrategy
   ) {
-    this.strategyList = [addAttendanceStrategy, logoutStrategy, homeStrategy, manageEmployeesStrategy, manageActivitiesStrategy, dashBoardStrategy];
+    this.strategyList = [addAttendanceStrategy, logoutStrategy, homeStrategy, manageEmployeesStrategy, manageActivitiesStrategy, dashBoardStrategy, holidayStrategy];
     this.playAlert = require('alert-sound-notify')
     this.playAlert.volume(0.5);
   }

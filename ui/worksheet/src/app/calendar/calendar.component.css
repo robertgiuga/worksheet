@@ -6,3 +6,25 @@ mwl-calendar-open-day-events{
   background-color: whitesmoke;
 }
 
+.holiday-requests{
+  width:15px;
+  height: 15px;
+  min-width: 15px;
+  min-height: 15px;
+  max-width: 15px;
+  max-height: 15px;
+  border-radius: 5px;
+  background-color: #d63384;
+}
+
+.holiday-days{
+  width:15px;
+  height: 15px;
+  min-width: 15px;
+  min-height: 15px;
+  max-width: 15px;
+  max-height: 15px;
+  border-radius: 5px;
+  background-color: cornflowerblue;
+}
+

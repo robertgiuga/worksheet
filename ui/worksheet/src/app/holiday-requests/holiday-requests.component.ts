@@ -1,5 +1,4 @@
 import {Component, OnInit} from '@angular/core';
-import {User} from "../../model/User";
 import {Holiday} from "../../model/Holiday";
 import {HolidayService} from "./holiday.service";
 import {MatSnackBar} from "@angular/material/snack-bar";
@@ -11,7 +10,7 @@ import {MatSnackBar} from "@angular/material/snack-bar";
 })
 export class HolidayRequestsComponent implements OnInit {
   isError: boolean = false;
-  isLoading: boolean = false;
+  isLoading: boolean = true;
   datasource: Holiday[] = [];
   displayedColumns: string[] = ['position', 'name', 'email', 'interval', 'actions'];
 
@@ -19,16 +18,25 @@ export class HolidayRequestsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.holidayService.getPendingHolidayRequests().subscribe((value) => this.datasource= value, (err) => {
+    this.holidayService.getPendingHolidayRequests().subscribe((value) =>{ this.datasource= value; this.isLoading=false}, () => {
       this.snackBar.open("Some error occurred", "Ok", {duration: 2000})
+      this.isError=true;
     })
   }
 
   onAccept(element: Holiday) {
-
+    if(element.id) {
+      this.holidayService.acceptHolidayRequest(element.id).subscribe(()=>{
+        this.datasource= this.datasource.filter(h=>h.id!=element.id);
+      }, ()=>{ this.snackBar.open("Some error occurred", "Ok", {duration: 2000})})
+    }
   }
 
   onDecline(element: Holiday) {
-
+    if(element.id) {
+      this.holidayService.declineHolidayRequest(element.id).subscribe(()=>{
+        this.datasource= this.datasource.filter(h=>h.id!=element.id);
+      }, ()=>{ this.snackBar.open("Some error occurred", "Ok", {duration: 2000})})
+    }
   }
 }

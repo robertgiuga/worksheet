@@ -1,6 +1,7 @@
 <div class="row text-center" style="padding: 10px">
   <div class="col-md-1" style="padding-bottom: 5px">
-    <button mat-icon-button matTooltip="request holiday!!" color="accent" aria-label="Holiday request" (click)="onRequestHoliday(requestHolidayModal)">
+    <button mat-icon-button matTooltip="request holiday!!" color="accent" aria-label="Holiday request"
+            (click)="onRequestHoliday(requestHolidayModal)">
       <mat-icon>beach_access</mat-icon>
     </button>
   </div>
@@ -66,42 +67,52 @@
   <div [ngSwitch]="view">
     <ng-template #customCellTemplate let-day="day" let-locale="locale">
       <div class="cal-cell-top">
-    <span class="cal-day-badge" *ngIf="day.badgeTotal > 0">{{ day.badgeTotal }}</span>
+        <span class="cal-day-badge" *ngIf="day.badgeTotal > 0">{{ day.badgeTotal }}</span>
         <span class="cal-day-number">{{ day.date | calendarDate:'monthViewDayNumber':locale }}</span>
       </div>
-      <small ></small>
+      <small></small>
     </ng-template>
 
     <ng-template let-isOpen="isOpen" #customOpenDayTemplate>
       <div class="my-open-events" [@collapse]="" *ngIf="isOpen" style="padding: 10px">
         <div fxFlexFill *ngIf="!isAttendanceError && !isAttendanceLoading">
-          <h4>Actions:</h4>
-          <span>Add attendance</span>
-          <button #addAttendance id="add-attendance" mat-button color="primary"
-                  (click)="onAddAttendance(attendanceModal)">
-            <mat-icon>access_time</mat-icon>
-          </button>
-          <mat-list>
-            <mat-list-item role="listitem" *ngFor="let attendance of todayAttendance">
+          <div *ngIf="!isTodayHolidayRequest">
+            <p class="h5">Actions:</p>
+            <span style="font-size: 16px">Add attendance</span>
+            <button #addAttendance [disabled]="isTodayHoliday" id="add-attendance" mat-button color="primary"
+                    (click)="onAddAttendance(attendanceModal)">
+              <mat-icon>access_time</mat-icon>
+            </button>
+            <mat-list>
+              <mat-list-item role="listitem" *ngFor="let attendance of todayAttendance">
               <span>
                 <span style="color:cornflowerblue" *ngIf="attendance.activity">{{attendance.activity.name}}: </span>
                 <span> {{attendance.comment}} </span>
                 <span style="color:royalblue">{{formatTime(attendance.checkIn)}}
                   - {{formatTime(attendance.checkOut)}}</span>
               </span>
-              <ng-container>
-                <button mat-icon-button color="primary" (click)="onEditAttendance(attendance, editAttendanceModal)"
-                        matTooltip="edit attendance">
-                  <mat-icon>edit</mat-icon>
-                </button>
-                |
-                <button mat-icon-button color="warn" (click)="onDeleteAttendance(attendance, deleteAttendanceModal)"
-                        matTooltip="delete attendance">
-                  <mat-icon>delete</mat-icon>
-                </button>
-              </ng-container>
-            </mat-list-item>
-          </mat-list>
+                <ng-container>
+                  <button mat-icon-button color="primary" (click)="onEditAttendance(attendance, editAttendanceModal)"
+                          matTooltip="edit attendance">
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                  |
+                  <button mat-icon-button color="warn" (click)="onDeleteAttendance(attendance, deleteAttendanceModal)"
+                          matTooltip="delete attendance">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </ng-container>
+              </mat-list-item>
+            </mat-list>
+          </div>
+          <div *ngIf="isTodayHolidayRequest">
+            <p class="h5">Holiday Request</p>
+            <p *ngIf="todayHoliday.startDate&& todayHoliday.endDate" class="h6">You have a holiday request in date interval of: {{todayHoliday.startDate.split("T")[0]}} : {{todayHoliday.endDate.split("T")[0]}}</p>
+            <span style="font-size: 16px">Delete Holiday request</span>
+            <button  mat-button color="warn" matTooltip="delete request" (click)="deleteHolidayRequest(todayHoliday)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
         </div>
         <div fxFlexFill fxLayout="column" fxLayoutAlign="center center"
              *ngIf="isAttendanceLoading && !isAttendanceError">
@@ -134,6 +145,19 @@
       [viewDate]="viewDate"
     >
     </mwl-calendar-day-view>
+  </div>
+  <div class="container-sm text-start">
+    <p class="h5">Legend</p>
+    <div class="row">
+      <div class="col-sm-3 " style="display: flex">
+        <span class="holiday-requests m-1"></span>
+        <span class="h6 m-1">Holiday Requests</span>
+      </div>
+      <div class="col-sm-2 " style="display: flex">
+        <span class="holiday-days m-1"></span>
+        <span class="h6 m-1">Holiday Days</span>
+      </div>
+    </div>
   </div>
 </div>
 

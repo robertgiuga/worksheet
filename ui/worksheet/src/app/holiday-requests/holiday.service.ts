@@ -39,4 +39,24 @@ export class HolidayService{
       {headers: new HttpHeaders({'Authorization': 'Bearer ' + this.user.token})}
     );
   }
+
+  acceptHolidayRequest(holidayRequestId:number){
+    return this.http.patch(
+      'http://localhost:5000/api/holiday/accept',
+      holidayRequestId,
+      {headers: new HttpHeaders({'Authorization': 'Bearer ' + this.user.token})}
+    );
+  }
+  declineHolidayRequest(holidayRequestId:number){
+    return this.http.patch(
+      'http://localhost:5000/api/holiday/decline',
+      holidayRequestId,
+      {headers: new HttpHeaders({'Authorization': 'Bearer ' + this.user.token})}
+    );
+  }
+  deleteHolidayRequest(holidayRequestId:number){
+    return this.http.delete("http://localhost:5000/api/holiday/"+holidayRequestId,
+      {headers: new HttpHeaders({'Authorization': 'Bearer ' + this.user.token})}
+      )
+  }
 }
