@@ -39,6 +39,8 @@ namespace worksheet.Services
 
         public async Task<HolidayRecordDto> AddHolidayRequestAsync(HolidayRecordDto holidayRecord)
         {
+            if (holidayRecord.StartDate.Year > DateTime.Now.Year || holidayRecord.EndDate.Year > DateTime.Now.Year)
+                return null;
             var sameMonthRecords = await _worksheetContext.HolidayRecords
                 .Where(h => h.User.Id == holidayRecord.User.Id
                         && (holidayRecord.StartDate.Ticks >= h.StartDate.Ticks && holidayRecord.StartDate.Ticks <= h.EndDate.Ticks
@@ -66,9 +68,20 @@ namespace worksheet.Services
             var holidayReq = await _worksheetContext.HolidayRecords.FindAsync(holidayRequestId);
             if (holidayReq == null)
                 return false;
-            _worksheetContext.HolidayRecords.Remove(holidayReq);
+            holidayReq.Status = HolidayRecordType.rejected;
             await _worksheetContext.SaveChangesAsync();
             return true;
+        }
+
+        public async Task<bool> DeleteMyHolidayAsync(User user, int id)
+        {
+            var holiday = await _worksheetContext.HolidayRecords.Where(h=>h.Id==id).Include(h=>h.User).FirstAsync();
+            if (holiday.User.Id != user.Id)
+                return false;
+            _worksheetContext.HolidayRecords.Remove(holiday);
+            await _worksheetContext.SaveChangesAsync();
+            return true;
+
         }
 
         public async Task<IEnumerable<HolidayRecordDto>> GetHolidayPendigRequestsAsync()
@@ -84,9 +97,9 @@ namespace worksheet.Services
             return (userDb.UsedHolidayDays, userDb.HolidayDays);
         }
 
-        public async Task<IEnumerable<HolidayRecordDto>> GetUserHolidayRequestsAsync(int userId)
+        public async Task<IEnumerable<HolidayRecordDto>> GetUserCurrentYearHolidayRequestsAsync(int userId)
         {
-            return await _worksheetContext.HolidayRecords.Where(h => h.User.Id == userId).Select(h => new HolidayRecordDto { EndDate= h.EndDate, Id= h.Id, StartDate= h.StartDate, Status= h.Status.ToString()}).ToListAsync();
+            return await _worksheetContext.HolidayRecords.Where(h => h.User.Id == userId && h.StartDate.Year==DateTime.Now.Year).Select(h => new HolidayRecordDto { EndDate= h.EndDate, Id= h.Id, StartDate= h.StartDate, Status= h.Status.ToString()}).ToListAsync();
         }
     }
 }

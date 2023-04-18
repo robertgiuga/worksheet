@@ -1,7 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using worksheet.Context;
 using worksheet.Dto;
@@ -49,6 +51,55 @@ namespace worksheet.Services
             return new UserDto(modelUser);
         }
 
+        public async Task<byte[]> CreateMonthlyActivityReportAsync()
+        {
+            var csvFile = new StringBuilder();
+            var today = DateTime.Now;
+            csvFile.AppendLine(today.ToString());
+            csvFile.AppendLine("Employee Name;Day of Month");
+            csvFile.Append(";");
+            Enumerable.Range(1, DateTime.DaysInMonth(today.Year, today.Month)).ToList().ForEach(day => {
+                csvFile.Append(day).Append(";");
+            });
+            csvFile.AppendLine();
+
+            var fisrtDateOfMonth = new DateTime(today.Year, today.Month, 1);
+            var lastDateOfMonth = new DateTime(today.Year, today.Month, DateTime.DaysInMonth(today.Year, today.Month));
+            var users = await _worksheetContext.Users
+                .Include(u => u.Attendances.Where(a => fisrtDateOfMonth.Date <= a.CheckIn.Date && a.CheckIn.Date <= lastDateOfMonth.Date))
+                    .ThenInclude(a=>a.Activity)
+                .ToListAsync();
+            users.ForEach(u =>
+            {
+                csvFile.Append(u.GivenName).Append(" ").Append(u.Surname).Append(";");
+                var indexDay = fisrtDateOfMonth;
+                Enumerable.Range(1, DateTime.DaysInMonth(today.Year, today.Month)).ToList().ForEach(day => {
+                    var result = u.Attendances.Find(a => a.CheckIn.Date == indexDay.Date);
+                    if (result!=null)
+                    {
+                        csvFile.Append(result.CheckIn.TimeOfDay)
+                               .Append("-").Append(result.CheckOut.TimeOfDay).Append(" ")
+                               .Append(result.Comment).Append(" ").Append(result.Activity.Name)
+                               .Append(";");
+                    }
+                    else
+                    {
+                        var holiday =  this._worksheetContext.HolidayRecords.Where(h => h.User.Id == u.Id && h.StartDate <= indexDay.Date&& indexDay.Date<=h.EndDate).FirstOrDefault();
+                        if (holiday != null)
+                        {
+                            csvFile.Append("Holiday;");
+                        }
+                        else
+                            csvFile.Append("-;");
+                    }
+                    indexDay=indexDay.AddDays(1);
+                });
+                //append hours wored and extra hours
+                csvFile.AppendLine();
+            });
+            return Encoding.Unicode.GetBytes(csvFile.ToString());
+        }
+
         public async Task<IEnumerable<ActivityDto>> GetUserActivitiesAsync(int userId)
         {
             var result = await _worksheetContext.Users
@@ -86,6 +137,7 @@ namespace worksheet.Services
             userModel.GivenName = user.GivenName;
             userModel.Surname = user.Surname;
             userModel.Role = role;
+            userModel.HolidayDays = user.HolidayDays;
             _worksheetContext.Update(userModel);
             await _worksheetContext.SaveChangesAsync();
             return new UserDto(userModel);

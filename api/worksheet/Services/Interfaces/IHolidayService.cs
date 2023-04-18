@@ -15,10 +15,11 @@ namespace worksheet.Services.Interfaces
 
         Task<IEnumerable<HolidayRecordDto>> GetHolidayPendigRequestsAsync();
 
-        Task<IEnumerable<HolidayRecordDto>> GetUserHolidayRequestsAsync(int userId);
+        Task<IEnumerable<HolidayRecordDto>> GetUserCurrentYearHolidayRequestsAsync(int userId);
 
         Task<bool> AcceptHolidayRequestAsync(int holidayRequestId);
 
         Task<bool> DeclineHolidayRequestAsync(int holidayRequestId);
+        Task<bool> DeleteMyHolidayAsync(User user, int id);
     }
 }

@@ -12,6 +12,8 @@ using Microsoft.EntityFrameworkCore;
 using worksheet.Utils;
 using worksheet.Services.Interfaces;
 using worksheet.Services;
+using Quartz;
+using worksheet.Utils.Jobs;
 
 namespace worksheet
 {
@@ -29,11 +31,11 @@ namespace worksheet
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            //put db in root directory
             services.AddDbContext<WorksheetContext>(options =>
             {
                 options.UseSqlite(Configuration.GetConnectionString("Default"));
             });
+
             services.AddCors(config =>
                 config.AddDefaultPolicy(options => options.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));
 
@@ -66,6 +68,14 @@ namespace worksheet
                 options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
                 options.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
                 });
+
+            services.AddQuartz(q => {
+                q.UseMicrosoftDependencyInjectionJobFactory();
+                var holidayJobKey = new JobKey("HolidayJob");
+                q.AddJob<HolidayJob>(opts => opts.WithIdentity(holidayJobKey));
+
+                q.AddTrigger(opts => opts.ForJob(holidayJobKey).WithIdentity("HolidayJob-trigger").WithCronSchedule("0 0 1 1 * ?"));
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -76,11 +86,12 @@ namespace worksheet
                 app.UseDeveloperExceptionPage();
             }
             
+            
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
             app.UseCors();
-
+            
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

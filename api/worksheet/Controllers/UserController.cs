@@ -67,7 +67,17 @@ namespace worksheet.Controllers
                 return Problem();
             return Ok(result);
         }
-      
+
+        [HttpGet("report")]
+        [Authorize(Roles = "admin")]
+        [FormatFilter]
+        public async Task<FileResult> GetMonthlyActivityReport()
+        {
+            var file = await _userService.CreateMonthlyActivityReportAsync();
+
+            return File(file, "text/csv", "report.csv");
+        }
+
 
         private User GetCurrentUser()
         {

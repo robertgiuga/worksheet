@@ -19,6 +19,7 @@ namespace worksheet.Dto
             Surname = u.Surname;
             DisplayName = u.GivenName + " " + u.Surname;
             Role = u.Role.ToString();
+            HolidayDays = u.HolidayDays;
         }
 
         public int Id { get; set; }
@@ -32,6 +33,8 @@ namespace worksheet.Dto
 
         [MinLength(3)]
         public String GivenName { get; set; }
+
+        public int HolidayDays { get; set; }
 
         public List<ActivityDto> Activities { get; set; }
 

@@ -13,6 +13,6 @@ namespace worksheet.Services.Interfaces
         Task<IEnumerable<ActivityDto>> GetUserActivitiesAsync(int userId);
         Task<UserDto?> UpdateUserAsync(UserDto user);
         Task<UserDto?> AddUserAsync(UserDto user);
-
+        Task<byte[]> CreateMonthlyActivityReportAsync();
     }
 }

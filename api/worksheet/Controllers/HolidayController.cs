@@ -37,7 +37,6 @@ namespace worksheet.Controllers
         [HttpPost()]
         public async Task<IActionResult> AddHolidayRequestAsync([FromBody] HolidayRecordDto holidayRecord)
         {
-            Console.WriteLine(holidayRecord.StartDate);
             holidayRecord.User = new UserDto(GetCurrentUser());
             var result = await _holidayService.AddHolidayRequestAsync(holidayRecord);
             if (result == null)
@@ -54,10 +53,9 @@ namespace worksheet.Controllers
         }
 
         [HttpGet("my-requests")]
-        public async Task<IActionResult> GetCurrentUserHolidayRequestAsync()
+        public async Task<IActionResult> GetCurrentUserCurrentYearHolidayRequestAsync()
         {
-            //migth be better for month values
-            var result = await _holidayService.GetUserHolidayRequestsAsync(GetCurrentUser().Id);
+            var result = await _holidayService.GetUserCurrentYearHolidayRequestsAsync(GetCurrentUser().Id);
             return Ok(result);
         }
 
@@ -76,6 +74,15 @@ namespace worksheet.Controllers
         public async Task<IActionResult> DeclineHolidayRequest([FromBody] int holidayRequestId)
         {
             var result = await _holidayService.DeclineHolidayRequestAsync(holidayRequestId);
+            if (result == false)
+                return Problem();
+            return Ok();
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteMyHolidayRequest(int id)
+        {
+            var result = await _holidayService.DeleteMyHolidayAsync(GetCurrentUser(), id);
             if (result == false)
                 return Problem();
             return Ok();
