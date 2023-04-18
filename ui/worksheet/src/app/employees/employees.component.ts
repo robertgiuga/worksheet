@@ -25,6 +25,7 @@ export class EmployeesComponent implements OnInit {
   isActivityError: boolean = false;
   isActivityFetching: boolean = false;
   userActivities: ActivityUser[];
+  isReportLoading: boolean= false;
 
   constructor(private modalService: NgbModal,
               private userService: UserService,
@@ -85,50 +86,67 @@ export class EmployeesComponent implements OnInit {
   }
 
   updateUser(updateForm: NgForm) {
-    const newActivities = this.userActivities.filter(value => value.isHaving).map(value => <Activity>{id:value.id});
+    const newActivities = this.userActivities.filter(value => value.isHaving).map(value => <Activity>{id: value.id});
     let updateUser = JSON.parse(JSON.stringify(this.selectedUser));
     updateUser.email = updateForm.value.email;
     updateUser.givenName = updateForm.value.givenName;
     updateUser.surname = updateForm.value.surname;
-    updateUser.role= updateForm.value.role;
+    updateUser.role = updateForm.value.role;
     updateUser.displayName = updateUser.givenName + " " + updateUser.surname;
-    this.isLoading=true;
+    updateUser.holidayDays = updateForm.value.holidayDays;
+    console.log(updateUser);
+    this.isLoading = true;
     this.userService.updateUser(updateUser, newActivities).subscribe(
-      value =>{
+      value => {
         this.snackBar.open("User updated successfully", "Ok", {duration: 2000})
-        this.selectedUser.email= value.email;
-        this.selectedUser.surname= value.surname;
-        this.selectedUser.role= value.role;
-        this.selectedUser.displayName= value.displayName;
-        this.selectedUser.givenName= value.givenName;
+        this.selectedUser.email = value.email;
+        this.selectedUser.surname = value.surname;
+        this.selectedUser.role = value.role;
+        this.selectedUser.displayName = value.displayName;
+        this.selectedUser.givenName = value.givenName;
+        this.selectedUser.holidayDays = value.holidayDays
         console.log(this.selectedUser)
-        this.isLoading= false;
+        this.isLoading = false;
       }
-      , () =>{
+      , () => {
         this.snackBar.open("Some error occurred", "Ok", {duration: 2000})
-        this.isLoading= false;
+        this.isLoading = false;
       });
   }
 
   addUser(addForm: NgForm) {
-    const userActivities = this.userActivities.filter(value => value.isHaving).map(value => <Activity>{id:value.id});
+    const userActivities = this.userActivities.filter(value => value.isHaving).map(value => <Activity>{id: value.id});
     let user: User = {
       surname: addForm.value.surname,
       givenName: addForm.value.givenName,
       email: addForm.value.email,
-      role: addForm.value.role
+      role: addForm.value.role,
+      holidayDays: addForm.value.holidayDays
     }
-    this.isLoading= true;
-    this.userService.addUser(user,userActivities).subscribe(
+    this.isLoading = true;
+    this.userService.addUser(user, userActivities).subscribe(
       value => {
-        this.datasource= [...this.datasource, value];
-        this.isLoading=false;
-        this.snackBar.open("User added successfully", "Ok",{duration: 2000});},
-      () =>{
-        this.snackBar.open("Some error occurred", "Ok",{duration: 2000})
-        this.isLoading=false;
+        this.datasource = [...this.datasource, value];
+        this.isLoading = false;
+        this.snackBar.open("User added successfully", "Ok", {duration: 2000});
+      },
+      () => {
+        this.snackBar.open("Some error occurred", "Ok", {duration: 2000})
+        this.isLoading = false;
       });
   }
 
+  generateReport() {
+    this.isReportLoading= true;
+    this.userService.getMonthlyReport().subscribe((value) => {
+      this.isReportLoading= false;
+      var file = new Blob([value], {type: "text/csv"})
+      var link = document.createElement('a');
+      link.href = window.URL.createObjectURL(file);
+      link.download="report.csv";
+      link.click();
+      link.remove();
+    }, ()=>{this.isReportLoading= false})
+  }
 
 }

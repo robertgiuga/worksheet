@@ -27,31 +27,62 @@
       </div>
     </div>
   </div>
+  <br>
+  <h2>This are your current delegated activities:</h2>
 
-<h2>This are your current delegated activities:</h2>
+  <table fxFill mat-table [dataSource]="activityDataSource">
+    <!-- Position Column -->
+    <ng-container matColumnDef="position">
+      <th mat-header-cell *matHeaderCellDef> No.</th>
+      <td mat-cell *matCellDef="let element; let i= index"> {{i + 1}} </td>
+    </ng-container>
 
-<table fxFill mat-table [dataSource]="datasource">
-  <!-- Position Column -->
-  <ng-container matColumnDef="position">
-    <th mat-header-cell *matHeaderCellDef> No.</th>
-    <td mat-cell *matCellDef="let element; let i= index"> {{i + 1}} </td>
-  </ng-container>
+    <!-- Name Column -->
+    <ng-container matColumnDef="name">
+      <th mat-header-cell *matHeaderCellDef> Name</th>
+      <td mat-cell *matCellDef="let element"> {{element.name}} </td>
+    </ng-container>
 
-  <!-- Name Column -->
-  <ng-container matColumnDef="name">
-    <th mat-header-cell *matHeaderCellDef> Name</th>
-    <td mat-cell *matCellDef="let element"> {{element.name}} </td>
-  </ng-container>
+    <!-- Description Column -->
+    <ng-container matColumnDef="description">
+      <th mat-header-cell *matHeaderCellDef> Description</th>
+      <td mat-cell *matCellDef="let element"> {{element.description}} </td>
+    </ng-container>
 
-  <!-- Description Column -->
-  <ng-container matColumnDef="description">
-    <th mat-header-cell *matHeaderCellDef> Description</th>
-    <td mat-cell *matCellDef="let element"> {{element.description}} </td>
-  </ng-container>
+    <tr mat-header-row *matHeaderRowDef="activityDisplayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: activityDisplayedColumns;"></tr>
+  </table>
 
-  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-  <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-</table>
+  <br>
+  <h2> These are your holiday requests</h2>
+
+  <table fxFill mat-table [dataSource]="holidayDataSource">
+    <!-- Position Column -->
+    <ng-container matColumnDef="position">
+      <th mat-header-cell *matHeaderCellDef> No.</th>
+      <td mat-cell *matCellDef="let element; let i= index"> {{i + 1}} </td>
+    </ng-container>
+
+    <!-- Start Date Column -->
+    <ng-container matColumnDef="startDate">
+      <th mat-header-cell *matHeaderCellDef> Start Date</th>
+      <td mat-cell matTooltip="yyyy/MM/dd" *matCellDef="let element">{{element.startDate.split("T")[0]}}</td>
+    </ng-container>
+
+    <!--  End Date Column -->
+    <ng-container matColumnDef="endDate">
+      <th mat-header-cell *matHeaderCellDef>End Date</th>
+      <td mat-cell matTooltip="yyyy/MM/dd" *matCellDef="let element"> {{element.endDate.split("T")[0]}} </td>
+    </ng-container>
+    <!-- Status Column-->
+    <ng-container matColumnDef="status">
+      <th mat-header-cell *matHeaderCellDef> Status</th>
+      <td mat-cell [style.color]="element.status=='accepted'? 'green': (element.status=='pending'? '#ff4081': 'red')" *matCellDef="let element"> {{element.status}} </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="holidayDisplayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: holidayDisplayedColumns;"></tr>
+  </table>
 </div>
 
 <div fxFlexFill fxLayout="column" fxLayoutAlign="center center" *ngIf="isFetching && !isError">

@@ -44,7 +44,8 @@ export class UserService {
         Surname: user.surname,
         Email: user.email,
         Role: user.role,
-        Activities: userActivities
+        Activities: userActivities,
+        HolidayDays: user.holidayDays
       },
       {headers: new HttpHeaders({'Authorization': 'Bearer ' + this.user.token})}
     );
@@ -58,7 +59,8 @@ export class UserService {
         Surname: user.surname,
         Email: user.email,
         Role: user.role,
-        Activities: userActivities
+        Activities: userActivities,
+        HolidayDays: user.holidayDays
       },
       {headers: new HttpHeaders({'Authorization': 'Bearer ' + this.user.token})}
     );
@@ -98,6 +100,13 @@ export class UserService {
     return this.http.get<{ }>(
       'http://localhost:5000/api/attendance/hours',
       {headers: new HttpHeaders({'Authorization': 'Bearer ' + this.user.token})}
+    );
+  }
+
+  getMonthlyReport(){
+    return this.http.get(
+      'http://localhost:5000/api/user/report',
+      {headers: new HttpHeaders({'Authorization': 'Bearer ' + this.user.token} ), responseType:"text"}
     );
   }
 

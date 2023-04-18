@@ -3,6 +3,7 @@ import {Activity} from "../../model/Activity";
 import {UserService} from "../employees/user.service";
 import {forkJoin} from "rxjs";
 import {HolidayService} from "../holiday-requests/holiday.service";
+import {Holiday} from "../../model/Holiday";
 
 @Component({
   selector: 'app-dashboard',
@@ -13,8 +14,10 @@ export class DashboardComponent implements OnInit {
 
   isError: boolean = false;
   isFetching: boolean = false;
-  datasource: Activity[] = [];
-  displayedColumns: string[] = ['position', 'name', 'description'];
+  activityDataSource: Activity[] = [];
+  holidayDataSource: Holiday[] = [];
+  activityDisplayedColumns: string[] = ['position', 'name', 'description'];
+  holidayDisplayedColumns: string[] = ['position', 'startDate', 'endDate', 'status'];
   totalHours: number = 0;
   workedHours: number = 0;
   extraHours: number = 0;
@@ -29,10 +32,11 @@ export class DashboardComponent implements OnInit {
     let activities =this.userService.getLoggedUserActivities();
     let hours=this.userService.getHours();
     let holidayDays= this.holidayService.getUserHolidayDays();
-    forkJoin([activities, hours,holidayDays]).subscribe(value=>{
+    let holidayRequest= this.holidayService.getUserHolidayRequests();
+    forkJoin([activities, hours,holidayDays, holidayRequest]).subscribe(value=>{
       this.isFetching = false;
       this.isError = false;
-      this.datasource= value[0];
+      this.activityDataSource= value[0];
       // @ts-ignore
       this.totalHours = value[1].totalHours;
       // @ts-ignore
@@ -42,7 +46,8 @@ export class DashboardComponent implements OnInit {
       // @ts-ignore
       this.totalHolidayDays= value[2].totalDays;
       // @ts-ignore
-      this.usedHolidayDays= value[2].usedDays
+      this.usedHolidayDays= value[2].usedDays;
+      this.holidayDataSource= value[3];
 
     }, ()=>{
       this.isFetching = false;

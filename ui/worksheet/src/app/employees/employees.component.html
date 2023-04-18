@@ -5,9 +5,11 @@
       Add new Employee
     </button>
     <span fxFlex></span>
-    <button mat-raised-button color="accent" >
+    <button mat-raised-button color="accent" (click)="generateReport()" >
       Generate month activity report
     </button>
+    <span fxFlex="2"></span>
+    <mat-spinner *ngIf="isReportLoading" color="accent" diameter="40"></mat-spinner>
   </div>
   <br>
   <table fxFill mat-table [dataSource]="datasource">
@@ -90,6 +92,11 @@
           </mat-select>
         </mat-form-field>
 
+        <mat-form-field fxFlexFill>
+          <mat-label>Holiday days</mat-label>
+          <input matInput  name="holidayDays" [ngModel]="selectedUser.holidayDays" required type="number">
+        </mat-form-field>
+
         <mat-label>Use activities:</mat-label>
         <mat-selection-list class="myList">
           <mat-list-option *ngFor="let activity of userActivities" [value]="activity.id" [(selected)]="activity.isHaving">
@@ -147,6 +154,11 @@
             <mat-option value="admin">Admin</mat-option>
             <mat-option value="user">User</mat-option>
           </mat-select>
+        </mat-form-field>
+
+        <mat-form-field fxFlexFill>
+          <mat-label>Holiday days</mat-label>
+          <input matInput  name="holidayDays" required type="number">
         </mat-form-field>
 
         <mat-label>Use activities:</mat-label>

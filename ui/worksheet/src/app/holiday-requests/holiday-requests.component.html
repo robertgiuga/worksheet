@@ -53,6 +53,6 @@
   <p style="font-size: 30px">Some error occurred!</p>
 </div>
 
-<div  fxFlexFill fxLayout="column" fxLayoutAlign="center center" *ngIf="datasource.length==0">
+<div  fxFlexFill fxLayout="column" fxLayoutAlign="center center" *ngIf="datasource.length==0 && !isError&& !isLoading">
   <p style="font-size: 20px">There are no holiday requests:)</p>
 </div>

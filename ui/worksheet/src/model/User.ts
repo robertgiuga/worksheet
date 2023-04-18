@@ -4,5 +4,6 @@ export interface User {
   displayName?: string,
   surname?: string,
   givenName?: string,
-  role?: string
+  role?: string,
+  holidayDays?: number
 }

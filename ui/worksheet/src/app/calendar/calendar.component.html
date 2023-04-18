@@ -97,7 +97,7 @@
                     <mat-icon>edit</mat-icon>
                   </button>
                   |
-                  <button mat-icon-button color="warn" (click)="onDeleteAttendance(attendance, deleteAttendanceModal)"
+                  <button mat-icon-button color="warn" (click)="onDeleteAttendance(attendance, deleteModal)"
                           matTooltip="delete attendance">
                     <mat-icon>delete</mat-icon>
                   </button>
@@ -109,7 +109,7 @@
             <p class="h5">Holiday Request</p>
             <p *ngIf="todayHoliday.startDate&& todayHoliday.endDate" class="h6">You have a holiday request in date interval of: {{todayHoliday.startDate.split("T")[0]}} : {{todayHoliday.endDate.split("T")[0]}}</p>
             <span style="font-size: 16px">Delete Holiday request</span>
-            <button  mat-button color="warn" matTooltip="delete request" (click)="deleteHolidayRequest(todayHoliday)">
+            <button  mat-button color="warn" matTooltip="delete request" (click)="onDeleteHolidayRequest(deleteModal,todayHoliday)">
               <mat-icon>delete</mat-icon>
             </button>
           </div>
@@ -242,15 +242,15 @@
 </ng-template>
 
 
-<ng-template #deleteAttendanceModal let-modal>
+<ng-template #deleteModal let-modal>
   <div class="modal-header">
-    <h4 class="modal-title" id="delete-modal">Deleting {{selectedAttendance.comment}}?</h4>
+    <h4 class="modal-title" id="delete-modal">Deleting {{valueToDelete.title}}?</h4>
     <button mat-icon-button (click)="modal.close('None')" color="warn">
       <mat-icon>close</mat-icon>
     </button>
   </div>
   <div class="modal-body" style="width: auto">
-    <form id="deleteForm" (ngSubmit)="deleteAttendance(selectedAttendance.id)">
+    <form id="deleteForm" (ngSubmit)="onDeleteFunc()">
       <p style="font-size: 20px; font-weight: bold">Are you sure?</p>
     </form>
   </div>
@@ -351,12 +351,12 @@
 
       <mat-form-field appearance="fill">
         <mat-label>Enter a date range</mat-label>
-        <mat-date-range-input [rangePicker]="picker" [min]="minDate">
-          <input matStartDate ngModel placeholder="Start date" name="startDate" required>
+        <mat-date-range-input   [rangePicker]="picker" [min]="minDate" [dateFilter]="dateFilterFn">
+          <input matStartDate matF ngModel placeholder="Start date" name="startDate" required>
           <input matEndDate ngModel placeholder="End date" name="endDate" required>
         </mat-date-range-input>
         <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-        <mat-date-range-picker #picker></mat-date-range-picker>
+        <mat-date-range-picker  #picker ></mat-date-range-picker>
       </mat-form-field>
 
     </form>
