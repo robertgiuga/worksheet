@@ -3,15 +3,9 @@ import {MatDrawerMode} from "@angular/material/sidenav";
 import {Router} from "@angular/router";
 import {AuthService} from "../auth/auth.service";
 import {UserLogin} from "../../model/UserLogin";
-import {MatSnackBar} from "@angular/material/snack-bar";
-import {SpeechRecognitionService} from "../speech/speech-recognition.service";
-import {map, merge, Observable, of, Subject} from "rxjs";
 import {ActionContext} from "../speech/action-context";
-import {tap} from "rxjs/operators";
-import {SpeechError, SpeechEvent, SpeechNotification} from "../speech/shared";
 import {LogoutStrategy} from "../speech/actions/logout-strategy";
-
-declare var webkitSpeechRecognition: any;
+import {AssistantService} from "../speech/assistantService";
 
 
 @Component({
@@ -29,10 +23,9 @@ export class WrapperComponent implements OnInit {
   public isRecording = false;
 
   constructor(private router: Router,
-              private speechRecognition: SpeechRecognitionService,
+              private assistantService: AssistantService,
               private actionContext: ActionContext,
               private zone: NgZone,
-              private cdr: ChangeDetectorRef,
               private logOutStrategy: LogoutStrategy,
               private authService: AuthService) {
   }
@@ -43,10 +36,11 @@ export class WrapperComponent implements OnInit {
         this.username = user.fullName ? user.fullName : "";
       }
     );
+/*
     this.speechRecognition.transcriptSubject.subscribe(value =>
       this.actionContext.processMessage(value)
-    )
-    this.speechRecognition.startEndSubject.subscribe(value => {
+    )*/
+  /*  this.speechRecognition.isRecordingSubject.subscribe(value => {
       if(value==='end') {
         this.isRecording = false;
         this.cdr.detectChanges();
@@ -55,7 +49,7 @@ export class WrapperComponent implements OnInit {
         this.isRecording = true;
         this.cdr.detectChanges();
       }
-    });
+    });*/
     this.logOutSubscription= this.logOutStrategy.transcriptSubject.subscribe(value => {
       if (value === this.logOutStrategy.getStartSignal()) {
         this.zone.run(() => {
@@ -85,9 +79,9 @@ export class WrapperComponent implements OnInit {
   onToggleRecognition() {
     this.isRecording = !this.isRecording;
     if (this.isRecording) {
-      this.speechRecognition.start();
+      this.assistantService.start();
     } else {
-      this.speechRecognition.stop();
+      this.assistantService.stop();
     }
   }
 

@@ -9,22 +9,19 @@ export class HolidayStrategy extends ActionStrategy {
 
   constructor(private router:Router, private zone:NgZone) {
     super();
-    this.mapStartSignal= 'holiday';
-
-    this.mapEndSignal='';
+    this.mapStartSignal= 'navigate to holiday page';
 
     this.mapInitResponse= 'Navigating to Holiday page';
 
-    this.mapActionDone= '';
-
-    this.pageLink= '';
+    this.pageLink= '/holiday-requests';
   }
 
 
   runAction(input: string): boolean {
     this.zone.run(()=>{
-      this.router.navigate(['/holiday-requests']);
+      this.router.navigate([this.pageLink]);
     })
     return false;
   }
+
 }

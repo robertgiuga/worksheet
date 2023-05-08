@@ -1,21 +1,17 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {SpeechRecognitionService} from "./speech-recognition.service";
 
 @Injectable({
   providedIn: 'root',
 })
 export class SpeechSynthesizerService {
-  speechSynthesizer!: SpeechSynthesisUtterance;
-  language = 'en-US';
+  private speechSynthesizer!: SpeechSynthesisUtterance;
+  private language = 'en-US';
 
-  constructor(private speechRecognition: SpeechRecognitionService) {
+  constructor() {
     this.initSynthesis();
-    this.speechSynthesizer.onstart=(event)=>{
-      this.speechRecognition.stop();
-    }
-    this.speechSynthesizer.onend=(event)=>{
-      this.speechRecognition.start();
-    }
+    this.speechSynthesizer.onstart = (event) => this.onStart();
+    this.speechSynthesizer.onend = (event) => this.onEnd();
   }
 
   initSynthesis(): void {
@@ -23,11 +19,15 @@ export class SpeechSynthesizerService {
     this.speechSynthesizer.volume = 1;
     this.speechSynthesizer.rate = 1;
     this.speechSynthesizer.pitch = 1;
+    this.speechSynthesizer.lang = this.language;
   }
 
   speak(message: string): void {
-    this.speechSynthesizer.lang = this.language;
     this.speechSynthesizer.text = message;
     speechSynthesis.speak(this.speechSynthesizer);
   }
+
+  onStart:(() => any);
+
+  onEnd: (() => any);
 }

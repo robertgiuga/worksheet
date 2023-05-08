@@ -36,31 +36,26 @@ export class ActionContext {
     this.playAlert.volume(0.5);
   }
 
+
   processMessage(message: string): void {
     console.log(message);
     const msg = message.toLowerCase();
-    const hasChangedStrategy = this.hasChangedStrategy(msg);
+    this.hasChangedStrategy(msg);
 
     if (this.currentStrategy == undefined) {
-      console.log("**")
+      console.log("no strategy")
       this.playAlert('purr');
     }
-    let isFinishSignal = false;
-    if (!hasChangedStrategy) {
-      isFinishSignal = this.isFinishSignal(msg);
-    }
-    if (!isFinishSignal) {
-      this.runAction(message);
-    }
+    this.runAction(message);
+    this.isFinishSignal(msg);
 
   }
 
   runAction(input: string): void {
     if (this.currentStrategy) {
-      let response = this.currentStrategy.runAction(input);
-      if (!response) {
+      const val= this.currentStrategy.runAction(input);
+      if(!val)
         this.setStrategy(undefined);
-      }
     }
   }
 
@@ -68,7 +63,7 @@ export class ActionContext {
     this.currentStrategy = strategy;
   }
 
-  private hasChangedStrategy(message: string): boolean {
+  private hasChangedStrategy(message: string) {
     let strategy: ActionStrategy | undefined;
     this.strategyList.forEach(value => {
       if (message === value.getStartSignal()) {
@@ -77,35 +72,25 @@ export class ActionContext {
     });
     if (strategy) {
       this.setStrategy(strategy);
-      this.speechSynthesizer.speak(
-        strategy.getInitialResponse());
-      return true;
+      if (strategy.getInitialResponse() != null) {
+        // @ts-ignore
+        this.speechSynthesizer.speak(strategy.getInitialResponse());
+      }
     }
-
-    return false;
   }
 
-  private isFinishSignal(message: string): boolean {
-    let endSignal: boolean = false;
-    this.strategyList.forEach(value => {
-      if (message === value.getEndSignal()) {
-        endSignal = true;
-      }
-    });
+  private isFinishSignal(message: string) {
+    let endSignal: boolean = message === this.currentStrategy?.getEndSignal();
     if (endSignal) {
-      if (this.currentStrategy) {
-        this.speechSynthesizer.speak(
-          this.currentStrategy.getFinishResponse());
+      if (this.currentStrategy && this.currentStrategy.getFinishResponse() != null) {
+        // @ts-ignore
+        this.speechSynthesizer.speak(this.currentStrategy.getFinishResponse());
       }
       this.setStrategy(undefined);
-      return true;
     }
-
-    return false;
   }
 
-  stopStrategy(startSignal: string) {
-    if (this.currentStrategy?.getStartSignal() === startSignal)
-      this.currentStrategy = undefined;
+  stopCurrentStrategy() {
+    this.currentStrategy = undefined;
   }
 }

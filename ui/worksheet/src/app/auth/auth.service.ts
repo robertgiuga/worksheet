@@ -6,6 +6,7 @@ import {BehaviorSubject, throwError} from 'rxjs';
 import {UserLogin} from "../../model/UserLogin";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {SpeechRecognitionService} from "../speech/speech-recognition.service";
+import {AssistantService} from "../speech/assistantService";
 
 
 export interface AuthResponseData {
@@ -20,7 +21,10 @@ export class AuthService {
   user = new BehaviorSubject<UserLogin>({});
   private tokenExpirationTimer: any;
 
-  constructor(private http: HttpClient, private router: Router, private modalService: NgbModal, private speechRecognitionService: SpeechRecognitionService) {
+  constructor(private http: HttpClient,
+              private router: Router,
+              private modalService: NgbModal,
+              private assistantService: AssistantService) {
   }
 
   login(email: string, password: string) {
@@ -81,7 +85,7 @@ export class AuthService {
 
   logout() {
     this.user.next({});
-    this.speechRecognitionService.setEndRecognition(true);
+    this.assistantService.stop();
     this.router.navigate(['/login']);
     localStorage.removeItem('userData');
     if (this.tokenExpirationTimer) {

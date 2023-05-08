@@ -13,7 +13,6 @@ import {AddAttendanceStrategy} from "../speech/actions/add-attendance-strategy";
 import {ActionContext} from "../speech/action-context";
 import {Holiday} from "../../model/Holiday";
 import {HolidayService} from "../holiday-requests/holiday.service";
-import {MAT_DATE_LOCALE} from '@angular/material/core';
 
 @Component({
   selector: 'app-calendar',
@@ -41,7 +40,6 @@ export class CalendarComponent implements OnInit {
   questionNr: number = 0;
   comment: string = "";
   activity: Activity;
-  transcriptSubject$;
   subscription;
   minDate: Date;
   holidayRequests: Holiday[];
@@ -53,7 +51,7 @@ export class CalendarComponent implements OnInit {
   onDeleteFunc: Function;
   @ViewChild("calendar") calendar;
 
-  dateFilterFn = (date: Date)=> ![0,6].includes(date.getDay());
+  dateFilterFn = (date: Date) => ![0, 6].includes(date.getDay());
 
 
   constructor(private modalService: NgbModal,
@@ -71,17 +69,15 @@ export class CalendarComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.transcriptSubject$ = this.addAttendanceStrategy.transcriptSubject;
   }
 
   ngOnDestroy(): void {
 
-    this.subscription.unsubscribe();
     this.modalService.dismissAll();
   }
 
   ngAfterViewInit(): void {
-    this.subscription = this.transcriptSubject$.subscribe(this.attendanceAssistant.bind(this));
+    this.addAttendanceStrategy.observable.subscribe(this.attendanceAssistant.bind(this));
   }
 
   beforeMonthViewRender(renderEvent: CalendarMonthViewBeforeRenderEvent): void {
@@ -120,103 +116,102 @@ export class CalendarComponent implements OnInit {
     return [val, holiday];
   }
 
-  private
 
   notify() {
-    console.log("*")
+    console.log("stop strategy")
     this.questionNr = 0;
-    this.actionContext.stopStrategy(this.addAttendanceStrategy.getStartSignal());
+    this.actionContext.stopCurrentStrategy();
   }
 
   private attendanceAssistant(value: string) {
     console.log(value);
-    if (this.questionNr == 0) {
-      this.showPopUpCurrentDayAttendance();
-      this.speechSynthesizer.speak("What activity are you doing on today?");
-      this.questionNr++;
-    } else {
-      switch (this.questionNr) {
-        case 1:
-          const activity = this.userActivities.find(value1 => value1.name?.toLowerCase() === value.toLowerCase());
-          if (activity) {
-            this.zone.run(() => {
-              this.activity = activity;
-            })
-            this.speechSynthesizer.speak("check in time?");
-          } else {
-            this.speechSynthesizer.speak("sorry I did not find that please try again");
-            this.questionNr--;
-          }
+    console.log(this.questionNr)
+    switch (this.questionNr) {
+      case 0:
+        this.showPopUpCurrentDayAttendance();
+        this.speechSynthesizer.speak("What activity are you doing on today?");
+        break;
+      case 1:
+        const activity = this.userActivities.find(value1 => value1.name?.toLowerCase() === value.toLowerCase());
+        if (activity) {
+          this.zone.run(() => {
+            this.activity = activity;
+          })
+          this.speechSynthesizer.speak("check in time?");
+        } else {
+          this.speechSynthesizer.speak("sorry I did not find that please try again");
+          this.questionNr--;
+        }
+        break;
+      case 2:
+        let isValid = /^([0-1][0-9]):([0-5][0-9])$/.test(value)
+        if (isValid) {
+          this.zone.run(() => {
+            this.checkIn = value;
+          });
+          this.speechSynthesizer.speak("check out time?");
           break;
-        case 2:
-          let isValid = /^([0-1][0-9]):([0-5][0-9])$/.test(value)
-          if (isValid) {
-            this.zone.run(() => {
-              this.checkIn = value;
-            });
-            this.speechSynthesizer.speak("check out time?");
-            break;
-          }
-          const hourI = value.split(':')[0];
-          const minuteI = value.split(':')[1];
-          if (+hourI) {
-            if (hourI.length === 1) {
-              let newValue = "0" + hourI;
-              if (+minuteI)
-                newValue += ":" + minuteI;
-              else
-                newValue += ":00"
-              isValid = /^([0-1][0-9]):([0-5][0-9])$/.test(newValue)
-              if (isValid) {
-                this.zone.run(() => {
-                  this.checkIn = newValue;
-                });
-                this.speechSynthesizer.speak("check out time?");
-                break;
-              }
+        }
+        const hourI = value.split(':')[0];
+        const minuteI = value.split(':')[1];
+        if (+hourI) {
+          if (hourI.length === 1) {
+            let newValue = "0" + hourI;
+            if (+minuteI)
+              newValue += ":" + minuteI;
+            else
+              newValue += ":00"
+            isValid = /^([0-1][0-9]):([0-5][0-9])$/.test(newValue)
+            if (isValid) {
+              this.zone.run(() => {
+                this.checkIn = newValue;
+              });
+              this.speechSynthesizer.speak("check out time?");
+              break;
             }
           }
-          this.speechSynthesizer.speak("sorry i could not get that please try again");
-          this.questionNr--;
-          break;
-        case 3:
-          let isValid2 = /^([0-1]?[0-9]|2[0-4]):([0-5][0-9])(:[0-5][0-9])?$/.test(value)
+        }
+        this.speechSynthesizer.speak("sorry i could not get that please try again");
+        this.questionNr--;
+        break;
+      case 3:
+        let isValid2 = /^([0-1]?[0-9]|2[0-4]):([0-5][0-9])(:[0-5][0-9])?$/.test(value)
+        if (isValid2) {
+          this.zone.run(() => {
+            this.checkOut = value;
+          });
+          this.speechSynthesizer.speak("comment?");
+        } else {
+          value += ":00";
+          isValid2 = /^([0-1]?[0-9]|2[0-4]):([0-5][0-9])(:[0-5][0-9])?$/.test(value)
           if (isValid2) {
             this.zone.run(() => {
               this.checkOut = value;
             });
             this.speechSynthesizer.speak("comment?");
           } else {
-            value += ":00";
-            isValid2 = /^([0-1]?[0-9]|2[0-4]):([0-5][0-9])(:[0-5][0-9])?$/.test(value)
-            if (isValid2) {
-              this.zone.run(() => {
-                this.checkOut = value;
-              });
-              this.speechSynthesizer.speak("comment?");
-            } else {
-              this.speechSynthesizer.speak("sorry i could not get that please try again");
-              this.questionNr--;
-            }
-          }
-          break;
-        case 4:
-          this.zone.run(() => {
-            this.comment = value
-          })
-          break;
-        case 5:
-          if (value === "save") {
-            this.questionNr = 0;
-            // @ts-ignore
-            document.getElementById('save-attendance').click();
-            this.subscription.unsubscribe();
-          } else
+            this.speechSynthesizer.speak("sorry i could not get that please try again");
             this.questionNr--;
-          break;
-      }
-      this.questionNr++;
+          }
+        }
+        break;
+      case 4:
+        this.zone.run(() => {
+          this.comment = value
+        })
+        break;
+      case 5:
+        if (value === "save") {
+          console.log("saveeee")
+          this.questionNr = -1;
+          // @ts-ignore
+          document.getElementById('save-attendance').click();
+        } else
+          this.questionNr--;
+        break;
     }
+    this.questionNr++;
+
   }
 
   dayClicked({date}: { date: Date }): void {
@@ -270,7 +265,7 @@ export class CalendarComponent implements OnInit {
     this.comment = "";
     this.checkIn = '09:00';
     // this.checkOut = '17:OO';
-    this.questionNr = 0;
+    this.questionNr = -1;
   }
 
   addAttendance(attendanceFrom: NgForm) {
@@ -405,8 +400,8 @@ export class CalendarComponent implements OnInit {
       this.zone.run(() => {
         this.calendar.dayClicked.emit(emittedValue);
         this.cdr.detectChanges();
+      });
 
-      })
       this.showAttendanceInterval = setInterval(() => {
         if (!this.isAttendanceError && !this.isAttendanceLoading) {
           let element = document.getElementById("add-attendance") as HTMLElement;
@@ -447,7 +442,7 @@ export class CalendarComponent implements OnInit {
   }
 
   onDeleteHolidayRequest(content, holiday: Holiday) {
-    if (holiday.id!==undefined) {
+    if (holiday.id !== undefined) {
       this.valueToDelete = {title: "Holiday request", id: holiday.id}
       this.onDeleteFunc = () => {
         // @ts-ignore

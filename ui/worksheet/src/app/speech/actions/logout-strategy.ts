@@ -9,24 +9,18 @@ import {BehaviorSubject, Observable, Subject} from "rxjs";
 export class LogoutStrategy extends ActionStrategy {
   public transcriptSubject = new Subject<string>();
 
-  constructor(private speechSynthesizer: SpeechSynthesizerService) {
+  constructor() {
     super();
-    this.mapStartSignal= 'logout';
+    this.mapStartSignal= 'logout from app';
 
-    this.mapEndSignal='';
+    this.mapInitResponse= 'Logging out from app';
 
-    this.mapInitResponse= 'Logout from app';
-
-    this.mapActionDone= '';
-
-    this.pageLink= '';
   }
 
 
-  runAction(input: string): boolean {
+  runAction(input: string):boolean {
     this.transcriptSubject.next(input);
-    if (this.transcriptSubject.observers.length===0)
-      return false;
-    return true;
+    return false;
   }
+
 }

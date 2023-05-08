@@ -11,22 +11,19 @@ export class ManageActivitiesStrategy extends ActionStrategy {
 
   constructor(private router:Router, private zone:NgZone) {
     super();
-    this.mapStartSignal= 'manage activities';
-
-    this.mapEndSignal='';
+    this.mapStartSignal= 'navigate to manage activities page';
 
     this.mapInitResponse= 'Navigating to manage activities page';
 
-    this.mapActionDone= '';
-
-    this.pageLink= '';
+    this.pageLink= '/activities';
   }
 
 
   runAction(input: string): boolean {
     this.zone.run(()=>{
-      this.router.navigate(['/activities']);
+      this.router.navigate([this.pageLink]);
     })
     return false;
   }
+
 }

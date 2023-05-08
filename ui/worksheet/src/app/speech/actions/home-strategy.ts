@@ -11,22 +11,19 @@ export class HomeStrategy extends ActionStrategy {
 
   constructor(private router:Router, private zone:NgZone) {
     super();
-    this.mapStartSignal= 'home';
-
-    this.mapEndSignal='';
+    this.mapStartSignal= 'navigate to home page';
 
     this.mapInitResponse= 'Navigating to Home page';
 
-    this.mapActionDone= '';
-
-    this.pageLink= '';
+    this.pageLink= '/calendar';
   }
 
 
   runAction(input: string): boolean {
     this.zone.run(()=>{
-      this.router.navigate(['/calendar']);
+      this.router.navigate([this.pageLink]);
     })
     return false;
   }
+
 }

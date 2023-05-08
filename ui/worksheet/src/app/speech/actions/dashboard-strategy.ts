@@ -11,22 +11,19 @@ export class DashboardStrategy extends ActionStrategy {
 
   constructor(private router:Router, private zone:NgZone) {
     super();
-    this.mapStartSignal= 'dashboard';
-
-    this.mapEndSignal='';
+    this.mapStartSignal= 'navigate to dashboard page';
 
     this.mapInitResponse= 'Navigating to Dashboard page';
 
-    this.mapActionDone= '';
-
-    this.pageLink= '';
+    this.pageLink= '/dashboard';
   }
 
 
   runAction(input: string): boolean {
     this.zone.run(()=>{
-      this.router.navigate(['/dashboard']);
+      this.router.navigate([this.pageLink]);
     })
     return false;
   }
+
 }

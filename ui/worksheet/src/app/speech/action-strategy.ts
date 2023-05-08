@@ -1,33 +1,32 @@
 export abstract class ActionStrategy {
-  protected pageLink: string;
-  protected mapStartSignal: string;
-  protected mapEndSignal: string;
-
-  protected mapInitResponse:  string;
-  protected mapFinishResponse:   string;
-  protected mapActionDone:  string;
+  protected pageLink: string | null = null;
+  protected mapStartSignal: string ='';
+  protected mapEndSignal: string | null = null;
+  protected mapInitResponse: string| null = null;
+  protected mapFinishResponse: string | null = null;
 
   protected constructor() {
-    this.mapFinishResponse='Your action has been completed.';
   }
 
   getStartSignal(): string {
-    return this.mapStartSignal || '';
+    return this.mapStartSignal;
   }
 
-  getEndSignal(): string {
-    return this.mapEndSignal || '';
+  getEndSignal(): string | null {
+    return this.mapEndSignal;
   }
 
-  getInitialResponse(): string {
-    return this.mapInitResponse || '';
-  }
-  getFinishResponse(): string {
-    return this.mapFinishResponse || '';
-  }
-  getPageLink():string{
-    return this.pageLink || '';
+  getInitialResponse(): string| null {
+    return this.mapInitResponse;
   }
 
-  abstract  runAction(input: string): boolean;
+  getFinishResponse(): string | null {
+    return this.mapFinishResponse;
+  }
+
+  getPageLink(): string | null {
+    return this.pageLink;
+  }
+
+  abstract runAction(input: string):boolean;
 }
