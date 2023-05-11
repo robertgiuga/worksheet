@@ -66,23 +66,24 @@ namespace worksheet.Services
             }).ToListAsync();
         }
 
-        public async Task<(int WorkedHours, int TotalHours, int ExtraHours)?> GetUserHoursAsync(User user)
+        public async Task<(int WorkedMinutes, int TotalMinutes, int ExtraMinutes)?> GetUserMinutesAsync(User user)
         {
             var currentDate = DateTime.Now;
             var buissnesDays = Enumerable.Range(1, DateTime.DaysInMonth(currentDate.Year, currentDate.Month))
                 .Select(d => new DateTime(currentDate.Year, currentDate.Month, d))
                 .Count(d=>d.DayOfWeek!=DayOfWeek.Sunday&& d.DayOfWeek != DayOfWeek.Saturday);
-            int workedHours = 0, totalHours = buissnesDays*8, extrahours = 0;
+            int workedMinutes = 0, totalMinutes = buissnesDays*8*60, extraMinutes = 0;
             var userMothAttendance = await _worksheetContext.Attendances.Where(a =>
              a.User.Id == user.Id && a.CheckIn.Year.Equals(currentDate.Year) && a.CheckIn.Month.Equals(currentDate.Month)).ToArrayAsync();
             foreach (var a in userMothAttendance)
             {
-                TimeSpan dayHours = a.CheckOut.Subtract(a.CheckIn);
-                workedHours += (int)dayHours.TotalHours;
-                if (dayHours.TotalHours > 8)
-                    extrahours += (int)dayHours.TotalHours - 8;
+                TimeSpan dayWork = a.CheckOut.Subtract(a.CheckIn);
+                workedMinutes += (int)dayWork.TotalMinutes;
+                //TODO shuld use some enum
+                if (dayWork.TotalMinutes > 480)
+                    extraMinutes += (int)dayWork.TotalMinutes - 480;
             }
-            return (workedHours, totalHours, extrahours);
+            return (workedMinutes, totalMinutes, extraMinutes);
         }
 
         public async Task<AttendanceDto> UpdateAttendanceAsync(AttendanceDto attendance, User user)

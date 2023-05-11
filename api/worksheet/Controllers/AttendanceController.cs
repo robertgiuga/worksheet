@@ -59,12 +59,12 @@ namespace worksheet.Controllers
         }
 
         [HttpGet("hours")]
-        public async Task<IActionResult> GetCurrentUserHoursAsync()
+        public async Task<IActionResult> GetCurrentUserMinutesAsync()
         {
-            var result = await _attendanceService.GetUserHoursAsync(GetCurrentUser());
+            var result = await _attendanceService.GetUserMinutesAsync(GetCurrentUser());
             if (result == null)
                 return Problem();
-            return Ok(new { TotalHours= result.Value.TotalHours, WorkedHours= result.Value.WorkedHours, ExtraHours= result.Value.ExtraHours });
+            return Ok(new { TotalMinutes= result.Value.TotalMinutes, WorkedMinutes= result.Value.WorkedMinutes, ExtraMinutes= result.Value.ExtraMinutes });
         }
 
         private User GetCurrentUser()

@@ -17,11 +17,13 @@ namespace worksheet.Services
     {
         private readonly WorksheetContext _worksheetContext;
         private readonly IPasswordHasher _passwordHasher;
+        private readonly IAttendanceService _attendanceService;
 
-        public UserService(WorksheetContext worksheetContext, IPasswordHasher passwordHasher)
+        public UserService(WorksheetContext worksheetContext, IPasswordHasher passwordHasher, IAttendanceService attendanceService)
         {
             _worksheetContext = worksheetContext;
             _passwordHasher = passwordHasher;
+            _attendanceService = attendanceService;
         }
 
 
@@ -61,6 +63,7 @@ namespace worksheet.Services
             Enumerable.Range(1, DateTime.DaysInMonth(today.Year, today.Month)).ToList().ForEach(day => {
                 csvFile.Append(day).Append(";");
             });
+            csvFile.Append("Worked Hours").Append(";").Append("Extra Hours").Append(";");
             csvFile.AppendLine();
 
             var fisrtDateOfMonth = new DateTime(today.Year, today.Month, 1);
@@ -69,22 +72,27 @@ namespace worksheet.Services
                 .Include(u => u.Attendances.Where(a => fisrtDateOfMonth.Date <= a.CheckIn.Date && a.CheckIn.Date <= lastDateOfMonth.Date))
                     .ThenInclude(a=>a.Activity)
                 .ToListAsync();
-            users.ForEach(u =>
+            users.ForEach(async u =>
             {
                 csvFile.Append(u.GivenName).Append(" ").Append(u.Surname).Append(";");
                 var indexDay = fisrtDateOfMonth;
-                Enumerable.Range(1, DateTime.DaysInMonth(today.Year, today.Month)).ToList().ForEach(day => {
-                    var result = u.Attendances.Find(a => a.CheckIn.Date == indexDay.Date);
-                    if (result!=null)
+                Enumerable.Range(1, DateTime.DaysInMonth(today.Year, today.Month)).ToList().ForEach(day =>
+                {
+                    var result = u.Attendances.Where(a => a.CheckIn.Date == indexDay.Date).ToList();
+                    if (result.Count>0)
                     {
-                        csvFile.Append(result.CheckIn.TimeOfDay)
-                               .Append("-").Append(result.CheckOut.TimeOfDay).Append(" ")
-                               .Append(result.Comment).Append(" ").Append(result.Activity.Name)
-                               .Append(";");
+                        result.ForEach(r =>
+                        {
+                            csvFile.Append(r.CheckIn.TimeOfDay)
+                                   .Append("-").Append(r.CheckOut.TimeOfDay).Append(" ")
+                                   .Append(r.Comment.Trim()).Append(" ").Append(r.Activity.Name)
+                                   .Append("  ");
+                        });
+                        csvFile.Append(";");
                     }
                     else
                     {
-                        var holiday =  this._worksheetContext.HolidayRecords.Where(h => h.User.Id == u.Id && h.StartDate <= indexDay.Date&& indexDay.Date<=h.EndDate).FirstOrDefault();
+                        var holiday = this._worksheetContext.HolidayRecords.Where(h => h.User.Id == u.Id && h.StartDate <= indexDay.Date && indexDay.Date <= h.EndDate && h.Status == HolidayRecordType.accepted).FirstOrDefault();
                         if (holiday != null)
                         {
                             csvFile.Append("Holiday;");
@@ -92,9 +100,15 @@ namespace worksheet.Services
                         else
                             csvFile.Append("-;");
                     }
-                    indexDay=indexDay.AddDays(1);
+                    indexDay = indexDay.AddDays(1);
                 });
-                //append hours wored and extra hours
+                
+                var result =await  this._attendanceService.GetUserMinutesAsync(u);
+                if (result.HasValue)
+                {
+                    csvFile.Append(result.Value.WorkedMinutes / 60).Append(":").Append(result.Value.WorkedMinutes % 60).Append(";")
+                    .Append(result.Value.ExtraMinutes / 60).Append(":").Append(result.Value.ExtraMinutes % 60).Append(";");
+                }
                 csvFile.AppendLine();
             });
             return Encoding.Unicode.GetBytes(csvFile.ToString());
