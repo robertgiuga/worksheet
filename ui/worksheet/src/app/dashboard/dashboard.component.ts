@@ -20,7 +20,9 @@ export class DashboardComponent implements OnInit {
   holidayDisplayedColumns: string[] = ['position', 'startDate', 'endDate', 'status'];
   totalHours: number = 0;
   workedHours: number = 0;
+  workedMinutes: number = 0;
   extraHours: number = 0;
+  extraMinutes: number = 0;
   usedHolidayDays:number=0;
   totalHolidayDays:number=0;
 
@@ -38,11 +40,15 @@ export class DashboardComponent implements OnInit {
       this.isError = false;
       this.activityDataSource= value[0];
       // @ts-ignore
-      this.totalHours = value[1].totalHours;
+      this.totalHours = value[1].totalMinutes/60;
       // @ts-ignore
-      this.extraHours = value[1].extraHours;
+      this.extraHours = Math.trunc(value[1].extraMinutes/60);
       // @ts-ignore
-      this.workedHours = value[1].workedHours;
+      this.extraMinutes = Math.trunc(value[1].extraMinutes%60);
+      // @ts-ignore
+      this.workedHours = Math.trunc(value[1].workedMinutes/60);
+      // @ts-ignore
+      this.workedMinutes = Math.trunc(value[1].workedMinutes%60);
       // @ts-ignore
       this.totalHolidayDays= value[2].totalDays;
       // @ts-ignore
