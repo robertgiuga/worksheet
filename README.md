@@ -15,7 +15,7 @@ This repository contains a web application for managing worked hours in a compan
 
 ## Technologies Used
 
-- Backend: .NET Cor, C#
+- Backend: .NET Core, C#
 - Frontend: HTML, CSS, JavaScript, Angular
 - Database: SqLite
 
