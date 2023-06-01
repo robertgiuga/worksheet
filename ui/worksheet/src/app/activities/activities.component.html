@@ -1,0 +1,159 @@
+<div style="padding: 20px" *ngIf="!isLoading && !isError" class="myTable">
+  <div>
+    <button mat-raised-button color="primary" (click)="onAdd(addModal)">
+      Add new Activity
+    </button>
+  </div>
+  <br>
+  <table fxFill mat-table [dataSource]="datasource">
+
+    <!-- Position Column -->
+    <ng-container matColumnDef="position">
+      <th mat-header-cell *matHeaderCellDef> No.</th>
+      <td mat-cell *matCellDef="let element; let i= index"> {{i + 1}} </td>
+    </ng-container>
+
+    <!-- Name Column -->
+    <ng-container matColumnDef="name">
+      <th mat-header-cell *matHeaderCellDef> Name</th>
+      <td mat-cell *matCellDef="let element"> {{element.name}} </td>
+    </ng-container>
+
+    <!-- Description Column -->
+    <ng-container matColumnDef="description">
+      <th mat-header-cell *matHeaderCellDef> Description</th>
+      <td mat-cell *matCellDef="let element"> {{element.description}} </td>
+    </ng-container>
+
+    <!-- Actions Column -->
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef> Actions</th>
+      <td mat-cell *matCellDef="let element">
+        <button mat-icon-button color="primary" (click)="onEdit(updateModal, element)" matTooltip="edit activity">
+          <mat-icon>edit</mat-icon>
+        </button>
+        |
+        <button mat-icon-button color="warn" (click)="onDelete(deleteModal, element)" matTooltip="delete activity">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>
+</div>
+
+
+<ng-template #deleteModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="delete-modal">Deleting {{selectedActivity.name}} activity?</h4>
+    <button mat-icon-button (click)="modal.close('None')" color="warn">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+  <div class="modal-body" style="width: auto">
+    <form (ngSubmit)="deleteActivity(selectedActivity.id?selectedActivity.id:-1)" id="deleteForm">
+      <p style="font-size: 20px; font-weight: bold">Are you sure?</p>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button mat-raised-button color="warn" type="submit" form="deleteForm" (click)="modal.close('Delete')">Yes</button>
+    |
+    <button mat-raised-button color="primary" (click)="modal.close()">No</button>
+  </div>
+</ng-template>
+
+
+<ng-template #updateModal let-modal>
+  <div *ngIf="!isActivityFetching && !isActivityError">
+    <div class="modal-header">
+      <h4 class="modal-title" id="update-modal">Update {{selectedActivity.name}} activity?</h4>
+      <button mat-icon-button (click)="modal.dismiss()" color="warn">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+    <div class="modal-body" style="width: auto">
+      <form #updateForm="ngForm" (ngSubmit)="updateActivity(updateForm)" id="updateForm">
+        <mat-form-field fxFlexFill>
+          <mat-label>Name</mat-label>
+          <input matInput name="name" [ngModel]="selectedActivity.name" required>
+        </mat-form-field>
+
+        <mat-form-field fxFlexFill>
+          <mat-label>Description</mat-label>
+          <textarea matInput [ngModel]="selectedActivity.description" name="description" required></textarea>
+        </mat-form-field>
+
+        <mat-label>Users having this activity:</mat-label>
+        <mat-selection-list class="myList">
+          <mat-list-option *ngFor="let user of activityUsers" [value]="user.id" [(selected)]="user.isHaving">
+            {{user.displayName}}
+          </mat-list-option>
+        </mat-selection-list>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button mat-raised-button color="primary" type="submit" (click)="modal.close('Save')" form="updateForm"
+              [disabled]="updateForm.invalid">Save
+      </button>
+    </div>
+  </div>
+  <div fxFlexFill fxLayoutAlign="center center" *ngIf="isActivityFetching && !isActivityError">
+    <mat-spinner style="align-content: center"></mat-spinner>
+  </div>
+  <div fxFlexFill fxLayoutAlign="center center" style="padding: 10px" *ngIf="isActivityError">
+    <p style="font-size: 30px">Some error occurred!</p>
+  </div>
+</ng-template>
+
+
+<ng-template #addModal let-modal>
+  <div *ngIf="!isAddFetching && !isAddError">
+    <div class="modal-header">
+      <h4 class="modal-title" id="add-modal">Add activity?</h4>
+      <button mat-icon-button (click)="modal.dismiss()" color="warn">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+    <div class="modal-body" style="width: auto">
+      <form #addForm="ngForm" (ngSubmit)="addActivity(addForm)" id="addForm">
+        <mat-form-field fxFlexFill>
+          <mat-label>Name</mat-label>
+          <input matInput name="name" ngModel required>
+        </mat-form-field>
+
+        <mat-form-field fxFlexFill>
+          <mat-label>Description</mat-label>
+          <textarea matInput ngModel name="description" required></textarea>
+        </mat-form-field>
+
+        <mat-label>Select users to have this activity:</mat-label>
+        <mat-selection-list class="myList">
+          <mat-list-option *ngFor="let user of addActivityUsers" [value]="user.id" [(selected)]="user.isHaving">
+            {{user.displayName}}
+          </mat-list-option>
+        </mat-selection-list>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button mat-raised-button color="primary" type="submit" form="addForm" (click)="modal.close('Save')"
+              [disabled]="addForm.invalid">Save
+      </button>
+    </div>
+  </div>
+  <div fxFlexFill fxLayoutAlign="center center" *ngIf="isAddFetching && !isAddError">
+    <mat-spinner style="align-content: center"></mat-spinner>
+  </div>
+  <div fxFlexFill fxLayoutAlign="center center" style="padding: 10px" *ngIf="isAddError">
+    <p style="font-size: 30px">Some error occurred!</p>
+  </div>
+</ng-template>
+
+<div fxFlexFill fxLayout="column" fxLayoutAlign="center center" *ngIf="isLoading && !isError">
+  <mat-spinner style="align-content: center"></mat-spinner>
+</div>
+
+<div fxFlexFill fxLayout="column" fxLayoutAlign="center center" *ngIf="isError">
+  <p style="font-size: 30px">Some error occurred!</p>
+</div>

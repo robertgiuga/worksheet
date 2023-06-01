@@ -1,0 +1,16 @@
+th{
+  font-size: 18px;
+  font-weight: bold;
+  color: black;
+}
+.myList{
+  overflow: auto;
+  max-height: 200px;
+}
+
+.myTable{
+  max-height: 40%;
+  padding: 20px;
+}
+
+

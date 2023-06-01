@@ -1,0 +1,374 @@
+<div class="row text-center" style="padding: 10px">
+  <div class="col-md-1" style="padding-bottom: 5px">
+    <button mat-icon-button matTooltip="request holiday!!" color="accent" aria-label="Holiday request"
+            (click)="onRequestHoliday(requestHolidayModal)">
+      <mat-icon>beach_access</mat-icon>
+    </button>
+  </div>
+  <div class="col-md-4">
+    <div class="btn-group">
+      <div
+        class="btn btn-primary"
+        mwlCalendarPreviousView
+        [view]="view"
+        [(viewDate)]="viewDate"
+        (viewDateChange)="closeOpenMonthViewDay()"
+      >
+        Previous
+      </div>
+      <div
+        class="btn btn-outline-secondary"
+        mwlCalendarToday
+        [(viewDate)]="viewDate"
+      >
+        Today
+      </div>
+      <div
+        class="btn btn-primary"
+        mwlCalendarNextView
+        [view]="view"
+        [(viewDate)]="viewDate"
+        (viewDateChange)="closeOpenMonthViewDay()"
+      >
+        Next
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <h2>{{ viewDate | calendarDate:(view + 'ViewTitle'):'en' }}</h2>
+  </div>
+  <div class="col-md-4">
+    <div class="btn-group">
+      <div
+        class="btn btn-primary"
+        (click)="setView(CalendarView.Month)"
+        [class.active]="view === CalendarView.Month"
+      >
+        Month
+      </div>
+      <div
+        class="btn btn-primary"
+        (click)="setView(CalendarView.Week)"
+        [class.active]="view === CalendarView.Week"
+      >
+        Week
+      </div>
+      <div
+        class="btn btn-primary"
+        (click)="setView(CalendarView.Day)"
+        [class.active]="view === CalendarView.Day"
+      >
+        Day
+      </div>
+    </div>
+  </div>
+  <br/>
+  <br/>
+  <div [ngSwitch]="view">
+    <ng-template #customCellTemplate let-day="day" let-locale="locale">
+      <div class="cal-cell-top">
+        <span class="cal-day-badge" *ngIf="day.badgeTotal > 0">{{ day.badgeTotal }}</span>
+        <span class="cal-day-number">{{ day.date | calendarDate:'monthViewDayNumber':locale }}</span>
+      </div>
+      <small></small>
+    </ng-template>
+
+    <ng-template let-isOpen="isOpen" #customOpenDayTemplate>
+      <div class="my-open-events" [@collapse]="" *ngIf="isOpen" style="padding: 10px">
+        <div fxFlexFill *ngIf="!isAttendanceError && !isAttendanceLoading">
+          <div *ngIf="!isTodayHolidayRequest">
+            <p class="h5">Actions:</p>
+            <span style="font-size: 16px">Add attendance</span>
+            <button #addAttendance [disabled]="isTodayHoliday" id="add-attendance" mat-button color="primary"
+                    (click)="onAddAttendance(attendanceModal)">
+              <mat-icon>access_time</mat-icon>
+            </button>
+            <mat-list>
+              <mat-list-item role="listitem" *ngFor="let attendance of todayAttendance">
+              <span>
+                <span style="color:cornflowerblue" *ngIf="attendance.activity">{{attendance.activity.name}}: </span>
+                <span> {{attendance.comment}} </span>
+                <span style="color:royalblue">{{formatTime(attendance.checkIn)}}
+                  - {{formatTime(attendance.checkOut)}}</span>
+              </span>
+                <ng-container>
+                  <button mat-icon-button color="primary" (click)="onEditAttendance(attendance, editAttendanceModal)"
+                          matTooltip="edit attendance">
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                  |
+                  <button mat-icon-button color="warn" (click)="onDeleteAttendance(attendance, deleteModal)"
+                          matTooltip="delete attendance">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </ng-container>
+              </mat-list-item>
+            </mat-list>
+          </div>
+          <div *ngIf="isTodayHolidayRequest">
+            <p class="h5">Holiday Request</p>
+            <p *ngIf="todayHoliday.startDate&& todayHoliday.endDate" class="h6">You have a holiday request in date interval of: {{todayHoliday.startDate.split("T")[0]}} : {{todayHoliday.endDate.split("T")[0]}}</p>
+            <span style="font-size: 16px">Delete Holiday request</span>
+            <button  mat-button color="warn" matTooltip="delete request" (click)="onDeleteHolidayRequest(deleteModal,todayHoliday)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        </div>
+        <div fxFlexFill fxLayout="column" fxLayoutAlign="center center"
+             *ngIf="isAttendanceLoading && !isAttendanceError">
+          <mat-spinner style="align-content: center"></mat-spinner>
+        </div>
+
+        <div fxFlexFill fxLayout="column" fxLayoutAlign="center center" *ngIf="isAttendanceError">
+          <p style="font-size: 20px">Some error occurred!</p>
+        </div>
+      </div>
+    </ng-template>
+    <mwl-calendar-month-view #calendar
+                             *ngSwitchCase="CalendarView.Month"
+                             [viewDate]="viewDate"
+                             [activeDayIsOpen]="activeDayIsOpen"
+                             (dayClicked)="dayClicked($event.day)"
+                             [openDayEventsTemplate]="customOpenDayTemplate"
+                             [weekStartsOn]="1"
+                             [cellTemplate]="customCellTemplate"
+                             (beforeViewRender)="beforeMonthViewRender($event)"
+    >
+    </mwl-calendar-month-view>
+    <mwl-calendar-week-view
+      *ngSwitchCase="CalendarView.Week"
+      [viewDate]="viewDate"
+    >
+    </mwl-calendar-week-view>
+    <mwl-calendar-day-view
+      *ngSwitchCase="CalendarView.Day"
+      [viewDate]="viewDate"
+    >
+    </mwl-calendar-day-view>
+  </div>
+  <div class="container-sm text-start">
+    <p class="h5">Legend</p>
+    <div class="row">
+      <div class="col-sm-3 " style="display: flex">
+        <span class="holiday-requests m-1"></span>
+        <span class="h6 m-1">Holiday Requests</span>
+      </div>
+      <div class="col-sm-2 " style="display: flex">
+        <span class="holiday-days m-1"></span>
+        <span class="h6 m-1">Holiday Days</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #attendanceModal let-modal>
+  <div *ngIf="!isActivityLoading && !isActivityError">
+    <div class="modal-header">
+      <h4 class="modal-title" id="modal-basic-title">Add attendance</h4>
+      <button mat-icon-button color="warn" (click)="modal.dismiss('Cross click')">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+    <div class="modal-body" style="width: auto">
+      <form #attendanceForm="ngForm" (ngSubmit)="addAttendance(attendanceForm)" id="attendanceForm">
+
+        <mat-form-field fxFlexFill>
+          <mat-label>Activity</mat-label>
+          <mat-select (click)="notify()" name="activity" required [(ngModel)]="activity">
+            <mat-option *ngFor="let activity of userActivities" [value]="activity">{{activity.name}}</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field fxFlexFill>
+          <mat-label>Check in</mat-label>
+          <mat-label>Time</mat-label>
+          <input
+            (click)="notify()"
+            name="checkIn"
+            matInput
+            aria-label="default time"
+            [ngxTimepicker]="checkInTimeModal"
+            [format]="24"
+            [value]="'09:00'"
+            [(ngModel)]="checkIn"
+            required
+          />
+          <ngx-material-timepicker #checkInTimeModal>
+          </ngx-material-timepicker>
+        </mat-form-field>
+
+        <mat-form-field fxFlexFill>
+          <mat-label>Check out</mat-label>
+          <mat-label>Time</mat-label>
+          <input
+            (click)="notify()"
+            name="checkOut"
+            matInput
+            aria-label="default time"
+            [ngxTimepicker]="checkOutTimeModal"
+            [format]="24"
+            [value]="'17:00'"
+            [(ngModel)]="checkOut"
+            required
+          />
+          <ngx-material-timepicker #checkOutTimeModal>
+          </ngx-material-timepicker>
+        </mat-form-field>
+
+        <mat-form-field fxFlexFill>
+          <mat-label>Comment</mat-label>
+          <textarea (click)="notify()" matInput [(ngModel)]="comment" name="comment" required></textarea>
+        </mat-form-field>
+
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button mat-raised-button
+              id="save-attendance"
+              color="primary"
+              [disabled]="attendanceForm.invalid"
+              (click)="modal.close('Save click')"
+              type="submit" form="attendanceForm">
+        Save
+      </button>
+    </div>
+  </div>
+  <div fxFlexFill fxLayoutAlign="center center" *ngIf="isActivityLoading && !isActivityError">
+    <mat-spinner style="align-content: center"></mat-spinner>
+  </div>
+  <div fxFlexFill fxLayoutAlign="center center" style="padding: 10px" *ngIf="isActivityError">
+    <p style="font-size: 30px">Some error occurred!</p>
+  </div>
+</ng-template>
+
+
+<ng-template #deleteModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="delete-modal">Deleting {{valueToDelete.title}}?</h4>
+    <button mat-icon-button (click)="modal.close('None')" color="warn">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+  <div class="modal-body" style="width: auto">
+    <form id="deleteForm" (ngSubmit)="onDeleteFunc()">
+      <p style="font-size: 20px; font-weight: bold">Are you sure?</p>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button mat-raised-button color="warn" type="submit" form="deleteForm" (click)="modal.close('Delete')">Yes</button>
+    |
+    <button mat-raised-button color="primary" (click)="modal.close()">No</button>
+  </div>
+</ng-template>
+
+
+<ng-template #editAttendanceModal let-modal>
+  <div *ngIf="!isActivityLoading && !isActivityError">
+    <div class="modal-header">
+      <h4 class="modal-title" id="editAttendance">Edit attendance</h4>
+      <button mat-icon-button color="warn" (click)="modal.dismiss()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+    <div class="modal-body" style="width: auto">
+      <form #editAttendanceForm="ngForm" id="editAttendanceForm" (ngSubmit)="editAttendance(editAttendanceForm)">
+
+        <mat-form-field fxFlexFill>
+          <mat-label>Activity</mat-label>
+          <mat-select name="activity" required [ngModel]="selectedAttendance.activity">
+            <mat-option *ngFor="let activity of userActivities" [value]="activity">{{activity.name}}</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field fxFlexFill>
+          <mat-label>Check in</mat-label>
+          <mat-label>Time</mat-label>
+          <input
+            name="checkIn"
+            matInput
+            aria-label="default time"
+            [ngxTimepicker]="checkInTimeModal"
+            [format]="24"
+            [value]="'09:00'"
+            [(ngModel)]="selectedAttendanceCheckIn"
+            required
+          />
+          <ngx-material-timepicker #checkInTimeModal>
+          </ngx-material-timepicker>
+        </mat-form-field>
+
+        <mat-form-field fxFlexFill>
+          <mat-label>Check out</mat-label>
+          <mat-label>Time</mat-label>
+          <input
+            name="checkOut"
+            matInput
+            aria-label="default time"
+            [ngxTimepicker]="checkOutTimeModal"
+            [format]="24"
+            [value]="'17:00'"
+            [(ngModel)]="selectedAttendanceCheckOut"
+            required
+          />
+          <ngx-material-timepicker #checkOutTimeModal>
+          </ngx-material-timepicker>
+        </mat-form-field>
+
+        <mat-form-field fxFlexFill>
+          <mat-label>Comment</mat-label>
+          <textarea matInput [ngModel]="selectedAttendance.comment" name="comment" required></textarea>
+        </mat-form-field>
+
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button mat-raised-button
+              color="primary"
+              [disabled]="editAttendanceForm.invalid"
+              (click)="modal.close('Save click')"
+              type="submit" form="editAttendanceForm">
+        Save
+      </button>
+    </div>
+  </div>
+  <div fxFlexFill fxLayoutAlign="center center" *ngIf="isActivityLoading && !isActivityError">
+    <mat-spinner style="align-content: center"></mat-spinner>
+  </div>
+  <div fxFlexFill fxLayoutAlign="center center" style="padding: 10px" *ngIf="isActivityError">
+    <p style="font-size: 30px">Some error occurred!</p>
+  </div>
+</ng-template>
+
+<ng-template #requestHolidayModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="requestHoliday">Request holiday</h4>
+    <button mat-icon-button color="warn" (click)="modal.dismiss()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+  <div class="modal-body" style="width: auto">
+    <form #requestHolidayForm="ngForm" id="requestHolidayForm" (ngSubmit)="requestHoliday(requestHolidayForm)">
+
+      <mat-form-field appearance="fill">
+        <mat-label>Enter a date range</mat-label>
+        <mat-date-range-input   [rangePicker]="picker" [min]="minDate" [dateFilter]="dateFilterFn">
+          <input matStartDate matF ngModel placeholder="Start date" name="startDate" required>
+          <input matEndDate ngModel placeholder="End date" name="endDate" required>
+        </mat-date-range-input>
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-date-range-picker  #picker ></mat-date-range-picker>
+      </mat-form-field>
+
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button mat-raised-button
+            color="primary"
+            [disabled]="requestHolidayForm.invalid"
+            (click)="modal.close('request')"
+            type="submit" form="requestHolidayForm">
+      Request
+    </button>
+  </div>
+</ng-template>
+

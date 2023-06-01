@@ -1,0 +1,184 @@
+<div *ngIf="!isLoading && !isError" class="myTable">
+
+  <div>
+    <button mat-raised-button color="primary" (click)="onAdd(addModal)">
+      Add new Employee
+    </button>
+    <span fxFlex></span>
+    <button mat-raised-button color="accent" (click)="generateReport()" >
+      Generate month activity report
+    </button>
+    <span fxFlex="2"></span>
+    <mat-spinner *ngIf="isReportLoading" color="accent" diameter="40"></mat-spinner>
+  </div>
+  <br>
+  <table fxFill mat-table [dataSource]="datasource">
+    <!-- Position Column -->
+    <ng-container matColumnDef="position">
+      <th mat-header-cell *matHeaderCellDef> No.</th>
+      <td mat-cell *matCellDef="let element; let i= index"> {{i + 1}} </td>
+    </ng-container>
+
+    <!-- Display Name Column -->
+    <ng-container matColumnDef="name">
+      <th mat-header-cell *matHeaderCellDef> Name</th>
+      <td mat-cell *matCellDef="let element"> {{element.displayName}} </td>
+    </ng-container>
+
+    <!--  Email Column -->
+    <ng-container matColumnDef="email">
+      <th mat-header-cell *matHeaderCellDef> Email</th>
+      <td mat-cell *matCellDef="let element"> {{element.email}} </td>
+    </ng-container>
+
+<!--    &lt;!&ndash;  Contract Date Column &ndash;&gt;-->
+<!--    <ng-container matColumnDef="contractDate">-->
+<!--      <th mat-header-cell *matHeaderCellDef>Contract date</th>-->
+<!--      <td mat-cell *matCellDef="let element"> {{element.description}} </td>-->
+<!--    </ng-container>-->
+
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef> Actions</th>
+      <td mat-cell *matCellDef="let element">
+        <button mat-icon-button color="primary" (click)="onEdit(updateModal, element)">
+          <mat-icon>edit</mat-icon>
+        </button>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>
+</div>
+
+<div fxFlexFill fxLayout="column" fxLayoutAlign="center center" *ngIf="isLoading && !isError">
+  <mat-spinner style="align-content: center"></mat-spinner>
+</div>
+
+<div fxFlexFill fxLayout="column" fxLayoutAlign="center center" *ngIf="isError">
+  <p style="font-size: 30px">Some error occurred!</p>
+</div>
+
+
+<ng-template #updateModal let-modal>
+  <div *ngIf="!isActivityFetching && !isActivityError">
+    <div class="modal-header">
+      <h4 class="modal-title" id="update-modal">Update {{selectedUser.displayName}} user?</h4>
+      <button mat-icon-button (click)="modal.dismiss()" color="warn">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+    <div class="modal-body" style="width: auto">
+      <form #updateForm="ngForm" (ngSubmit)="updateUser(updateForm)" id="updateForm">
+        <mat-form-field fxFlexFill>
+          <mat-label>Given Name</mat-label>
+          <input matInput name="givenName"  [ngModel]="selectedUser.givenName" required>
+        </mat-form-field>
+
+        <mat-form-field fxFlexFill>
+          <mat-label>Surname</mat-label>
+          <input matInput name="surname" [ngModel]="selectedUser.surname" required>
+        </mat-form-field>
+
+        <mat-form-field fxFlexFill>
+          <mat-label>Email</mat-label>
+          <input matInput [ngModel]="selectedUser.email" name="email" required>
+        </mat-form-field>
+
+        <mat-form-field fxFlexFill>
+          <mat-label>User role</mat-label>
+          <mat-select name="role" required [ngModel]="selectedUser.role">
+            <mat-option value="admin">Admin</mat-option>
+            <mat-option value="user">User</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field fxFlexFill>
+          <mat-label>Holiday days</mat-label>
+          <input matInput  name="holidayDays" [ngModel]="selectedUser.holidayDays" required type="number">
+        </mat-form-field>
+
+        <mat-label>Use activities:</mat-label>
+        <mat-selection-list class="myList">
+          <mat-list-option *ngFor="let activity of userActivities" [value]="activity.id" [(selected)]="activity.isHaving">
+            {{activity.name}}
+          </mat-list-option>
+        </mat-selection-list>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button mat-raised-button color="primary" type="submit" (click)="modal.close('Save')" form="updateForm"
+              [disabled]="updateForm.invalid"
+      >
+        Save
+      </button>
+    </div>
+  </div>
+  <div fxFlexFill fxLayoutAlign="center center" *ngIf="isActivityFetching && !isActivityError">
+    <mat-spinner style="align-content: center"></mat-spinner>
+  </div>
+  <div fxFlexFill fxLayoutAlign="center center" style="padding: 10px" *ngIf="isActivityError">
+    <p style="font-size: 30px">Some error occurred!</p>
+  </div>
+</ng-template>
+
+
+
+<ng-template #addModal let-modal>
+  <div *ngIf="!isActivityFetching && !isActivityError">
+    <div class="modal-header">
+      <h4 class="modal-title" id="add-modal">Add user?</h4>
+      <button mat-icon-button (click)="modal.dismiss()" color="warn">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+    <div class="modal-body" style="width: auto">
+      <form #addForm="ngForm" (ngSubmit)="addUser(addForm)" id="addForm">
+        <mat-form-field fxFlexFill>
+          <mat-label>Given Name</mat-label>
+          <input matInput name="givenName" ngModel required>
+        </mat-form-field>
+
+        <mat-form-field fxFlexFill>
+          <mat-label>Surname</mat-label>
+          <input matInput name="surname" ngModel required>
+        </mat-form-field>
+
+        <mat-form-field fxFlexFill>
+          <mat-label>Email</mat-label>
+          <input matInput ngModel name="email" required>
+        </mat-form-field>
+
+        <mat-form-field fxFlexFill>
+          <mat-label>User role</mat-label>
+          <mat-select name="role" required ngModel>
+            <mat-option value="admin">Admin</mat-option>
+            <mat-option value="user">User</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field fxFlexFill>
+          <mat-label>Holiday days</mat-label>
+          <input matInput  name="holidayDays" required type="number">
+        </mat-form-field>
+
+        <mat-label>Use activities:</mat-label>
+        <mat-selection-list class="myList">
+          <mat-list-option *ngFor="let activity of userActivities" [value]="activity.id" [(selected)]="activity.isHaving">
+            {{activity.name}}
+          </mat-list-option>
+        </mat-selection-list>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button mat-raised-button color="primary" type="submit" form="addForm" (click)="modal.close('Save')"
+              [disabled]="addForm.invalid">Save
+      </button>
+    </div>
+  </div>
+  <div fxFlexFill fxLayoutAlign="center center" *ngIf="isActivityFetching && !isActivityError">
+    <mat-spinner style="align-content: center"></mat-spinner>
+  </div>
+  <div fxFlexFill fxLayoutAlign="center center" style="padding: 10px" *ngIf="isActivityError">
+    <p style="font-size: 30px">Some error occurred!</p>
+  </div>
+</ng-template>

@@ -1,0 +1,94 @@
+<div *ngIf="!isFetching && !isError" class="myTable">
+
+  <div class="card">
+    <div class="row">
+      <div class="col-sm-6">
+        <div class="card-body">
+          <h2 class="card-title">Your activity hours</h2>
+          <div style="font-size: large">
+            <span style="color: #3f51b5">Worked Hours </span>
+            <span>{{workedHours}}h,{{workedMinutes}}m/{{totalHours}}h</span>
+            <span style="color: #3f51b5"> Total Hours</span>
+            <br>
+            <span style="color: #d63384">Extra hours: </span>
+            <span>{{extraHours}}h,{{extraMinutes}}m</span>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-6">
+        <div class="card-body">
+          <h2 class="card-title">Your holiday days</h2>
+          <div style="font-size: large">
+            <span style="color: #3f51b5">Used </span>
+            <span>{{usedHolidayDays}}/{{totalHolidayDays}}</span>
+            <span style="color: #3f51b5"> Total </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <br>
+  <h2>This are your current delegated activities:</h2>
+
+  <table fxFill mat-table [dataSource]="activityDataSource">
+    <!-- Position Column -->
+    <ng-container matColumnDef="position">
+      <th mat-header-cell *matHeaderCellDef> No.</th>
+      <td mat-cell *matCellDef="let element; let i= index"> {{i + 1}} </td>
+    </ng-container>
+
+    <!-- Name Column -->
+    <ng-container matColumnDef="name">
+      <th mat-header-cell *matHeaderCellDef> Name</th>
+      <td mat-cell *matCellDef="let element"> {{element.name}} </td>
+    </ng-container>
+
+    <!-- Description Column -->
+    <ng-container matColumnDef="description">
+      <th mat-header-cell *matHeaderCellDef> Description</th>
+      <td mat-cell *matCellDef="let element"> {{element.description}} </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="activityDisplayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: activityDisplayedColumns;"></tr>
+  </table>
+
+  <br>
+  <h2> These are your holiday requests</h2>
+
+  <table fxFill mat-table [dataSource]="holidayDataSource">
+    <!-- Position Column -->
+    <ng-container matColumnDef="position">
+      <th mat-header-cell *matHeaderCellDef> No.</th>
+      <td mat-cell *matCellDef="let element; let i= index"> {{i + 1}} </td>
+    </ng-container>
+
+    <!-- Start Date Column -->
+    <ng-container matColumnDef="startDate">
+      <th mat-header-cell *matHeaderCellDef> Start Date</th>
+      <td mat-cell matTooltip="yyyy/MM/dd" *matCellDef="let element">{{element.startDate.split("T")[0]}}</td>
+    </ng-container>
+
+    <!--  End Date Column -->
+    <ng-container matColumnDef="endDate">
+      <th mat-header-cell *matHeaderCellDef>End Date</th>
+      <td mat-cell matTooltip="yyyy/MM/dd" *matCellDef="let element"> {{element.endDate.split("T")[0]}} </td>
+    </ng-container>
+    <!-- Status Column-->
+    <ng-container matColumnDef="status">
+      <th mat-header-cell *matHeaderCellDef> Status</th>
+      <td mat-cell [style.color]="element.status=='accepted'? 'green': (element.status=='pending'? '#ff4081': 'red')" *matCellDef="let element"> {{element.status}} </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="holidayDisplayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: holidayDisplayedColumns;"></tr>
+  </table>
+</div>
+
+<div fxFlexFill fxLayout="column" fxLayoutAlign="center center" *ngIf="isFetching && !isError">
+  <mat-spinner style="align-content: center"></mat-spinner>
+</div>
+
+<div fxFlexFill fxLayout="column" fxLayoutAlign="center center" *ngIf="isError">
+  <p style="font-size: 30px">Some error occurred!</p>
+</div>

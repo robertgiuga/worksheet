@@ -1,0 +1,70 @@
+<mat-sidenav-container fxFlexFill>
+  <mat-sidenav #sidenav [mode]="sidenavMode" opened class=".mysidenav">
+    <mat-nav-list class="my-list">
+      <img alt="company logo" fxLayoutAlign="center center"
+           src="https://seeklogo.com/images/B/business-company-logo-C561B48365-seeklogo.com.png">
+      <a routerLink="/calendar">
+        <mat-list-item class="my-list" routerLinkActive="selected">
+          <button disabled mat-button color="primary">
+            <mat-icon color="primary">home</mat-icon>
+          </button>
+          <span>Home</span>
+        </mat-list-item>
+      </a>
+      <a routerLink="/dashboard" >
+        <mat-list-item  routerLinkActive="selected">
+          <button disabled mat-button color="primary">
+            <mat-icon color="primary">dashboard</mat-icon>
+          </button>
+          <span>Dashboard</span>
+        </mat-list-item>
+      </a>
+      <a *ngIf="user.role=='admin'" routerLink="/activities">
+        <mat-list-item  routerLinkActive="selected">
+          <button disabled mat-button color="primary">
+            <mat-icon color="primary">local_activity</mat-icon>
+          </button>
+          <span>Manage Activities</span>
+        </mat-list-item>
+      </a>
+      <a *ngIf="user.role=='admin'" routerLink="/employees">
+        <mat-list-item  routerLinkActive="selected">
+          <button disabled mat-button color="primary">
+            <mat-icon color="primary">perm_identity</mat-icon>
+          </button>
+          <span>Manage Employees</span>
+        </mat-list-item>
+      </a>
+      <a *ngIf="user.role=='admin'" routerLink="/holiday-requests">
+        <mat-list-item  routerLinkActive="selected">
+          <button disabled mat-button color="primary">
+            <mat-icon color="primary">beach_access</mat-icon>
+          </button>
+          <span>Holiday Requests</span>
+        </mat-list-item>
+      </a>
+    </mat-nav-list>
+  </mat-sidenav>
+  <mat-sidenav-content>
+    <mat-toolbar color="primary" style="margin-bottom: 15px">
+      <button mat-icon-button (click)="sidenav.toggle()" matTooltip="toggle menu">
+        <mat-icon>menu</mat-icon>
+      </button>
+      <span>Worksheet</span>
+      <span fxFlex></span>
+      <span>Welcome {{username}}</span>
+      <span fxFlex></span>
+      <button mat-icon-button (click)="onToggleRecognition()">
+        <mat-icon>{{ isRecording ? 'mic' : 'mic_none' }}</mat-icon>
+      </button>
+      <mat-spinner *ngIf="isRecording" color="accent" diameter="20"></mat-spinner>
+      <span fxFlex="2"></span>
+      <button mat-icon-button (click)="logOut()" matTooltip="logout">
+        <mat-icon>
+          logout
+        </mat-icon>
+      </button>
+    </mat-toolbar>
+    <router-outlet></router-outlet>
+  </mat-sidenav-content>
+</mat-sidenav-container>

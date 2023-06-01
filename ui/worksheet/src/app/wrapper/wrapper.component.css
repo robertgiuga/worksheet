@@ -1,0 +1,28 @@
+img{
+  height: 20%;
+  width: 30%;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 10%;
+}
+.mysidenav{
+  width: 200px;
+}
+@media (min-width: 800px) {
+  .mysidenav{
+    width: 250px;
+  }
+}
+
+.my-list{
+  width: 200px;
+}
+@media (min-width: 800px) {
+  .my-list{
+    width: 250px;
+  }
+}
+
+.selected{
+  background-color: lightgray;
+}
